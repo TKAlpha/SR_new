@@ -9,7 +9,7 @@
         "name": "SqlServer 10.2.1.92 reports_abom",
         "connectionString": "Provider=SQLNCLI11;Data Source=10.2.1.92;Initial Catalog=reports_abom;Persist Security Info=false;User ID=CORP\\pgbaranov;Integrated Security=SSPI",
         "impersonationMode": "impersonateAccount",
-        "account": "CORP\\arzhandarov",
+        "account": "CORP\\pgbaranov",
         "annotations": [
           {
             "name": "ConnectionEditUISource",
@@ -340,6 +340,21 @@
               "        \"VX\"",
               "    )"
             ]
+          },
+          {
+            "name": "refusal_upper_limit",
+            "dataType": "string",
+            "sourceColumn": "refusal_upper_limit"
+          },
+          {
+            "type": "calculated",
+            "name": "refusal_reason",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": [
+              "",
+              "IF(ISBLANK(OrderShipmentRefusal[refusal_upper_limit]),RELATED(refusal_reason[title]), OrderShipmentRefusal[refusal_upper_limit])"
+            ]
           }
         ],
         "partitions": [
@@ -381,6 +396,7 @@
                 "ref.refusal_date,",
                 "ref.ref_quantity,",
                 "ref.ref_amount,",
+                "IIF(o.order_status_id = 'new', 'превышение лимита', NULL) AS refusal_upper_limit,",
                 "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
                 "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
                 "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
@@ -484,6 +500,7 @@
                   "ref.refusal_date,",
                   "ref.ref_quantity,",
                   "ref.ref_amount,",
+                  "IIF(o.order_status_id = 'new', 'превышение лимита', NULL) AS refusal_upper_limit,",
                   "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
                   "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
                   "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
@@ -589,6 +606,7 @@
               "ref.refusal_date,",
               "ref.ref_quantity,",
               "ref.ref_amount,",
+              "IIF(o.order_status_id = 'new', 'превышение лимита', NULL) AS refusal_upper_limit,",
               "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
               "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
               "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
@@ -694,6 +712,7 @@
               "ref.refusal_date,",
               "ref.ref_quantity,",
               "ref.ref_amount,",
+              "IIF(o.order_status_id = 'new', 'превышение лимита', NULL) AS refusal_upper_limit,",
               "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
               "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
               "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
