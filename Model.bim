@@ -1,0 +1,2502 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1200,
+  "model": {
+    "name": "Модель",
+    "culture": "ru-RU",
+    "dataSources": [
+      {
+        "name": "SqlServer 10.2.1.92 reports_abom",
+        "connectionString": "Provider=SQLNCLI11;Data Source=10.2.1.92;Initial Catalog=reports_abom;Persist Security Info=false;User ID=CORP\\pgbaranov;Integrated Security=SSPI",
+        "impersonationMode": "impersonateAccount",
+        "account": "CORP\\pgbaranov",
+        "annotations": [
+          {
+            "name": "ConnectionEditUISource",
+            "value": "SqlServer"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "OrderShipmentRefusal",
+        "columns": [
+          {
+            "name": "id",
+            "dataType": "int64",
+            "sourceColumn": "id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "deal_id",
+            "dataType": "int64",
+            "sourceColumn": "deal_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "parent_id",
+            "dataType": "int64",
+            "sourceColumn": "parent_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "order_item_id",
+            "dataType": "int64",
+            "sourceColumn": "order_item_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "customer_contractor_id",
+            "dataType": "int64",
+            "sourceColumn": "customer_contractor_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "customer_storage_id",
+            "dataType": "int64",
+            "sourceColumn": "customer_storage_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "supplier_contractor_id",
+            "dataType": "int64",
+            "sourceColumn": "supplier_contractor_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "supplier_storage_id",
+            "dataType": "int64",
+            "sourceColumn": "supplier_storage_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "standard_id",
+            "dataType": "int64",
+            "sourceColumn": "standard_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "order_status_id",
+            "dataType": "string",
+            "sourceColumn": "order_status_id",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "order_discriminator",
+            "dataType": "string",
+            "sourceColumn": "order_discriminator",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "order_item_date",
+            "dataType": "dateTime",
+            "sourceColumn": "order_item_date",
+            "formatString": "General Date",
+            "sourceProviderType": "Date"
+          },
+          {
+            "name": "planned_shipping_date",
+            "dataType": "dateTime",
+            "sourceColumn": "planned_shipping_date",
+            "formatString": "General Date",
+            "sourceProviderType": "Date"
+          },
+          {
+            "name": "order_item_quantity",
+            "dataType": "int64",
+            "sourceColumn": "order_item_quantity",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "order_item_amount",
+            "dataType": "double",
+            "sourceColumn": "order_item_amount",
+            "sourceProviderType": "Double"
+          },
+          {
+            "name": "shipment_date",
+            "dataType": "dateTime",
+            "sourceColumn": "shipment_date",
+            "formatString": "General Date",
+            "sourceProviderType": "Date"
+          },
+          {
+            "name": "shipment_amount",
+            "dataType": "double",
+            "sourceColumn": "shipment_amount",
+            "sourceProviderType": "Double"
+          },
+          {
+            "name": "shipment_quantity",
+            "dataType": "int64",
+            "sourceColumn": "shipment_quantity",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "reason_id",
+            "dataType": "int64",
+            "sourceColumn": "reason_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "refusal_date",
+            "dataType": "dateTime",
+            "sourceColumn": "refusal_date",
+            "formatString": "General Date",
+            "sourceProviderType": "Date"
+          },
+          {
+            "name": "ref_quantity",
+            "dataType": "int64",
+            "sourceColumn": "ref_quantity",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "ref_amount",
+            "dataType": "double",
+            "sourceColumn": "ref_amount",
+            "sourceProviderType": "Double"
+          },
+          {
+            "name": "fillrate_confirmed",
+            "dataType": "double",
+            "sourceColumn": "fillrate_confirmed",
+            "sourceProviderType": "Single"
+          },
+          {
+            "name": "fillrate_shippment",
+            "dataType": "double",
+            "sourceColumn": "fillrate_shippment",
+            "sourceProviderType": "Single"
+          },
+          {
+            "name": "fillare_refusal",
+            "dataType": "double",
+            "sourceColumn": "fillare_refusal",
+            "sourceProviderType": "Single"
+          },
+          {
+            "type": "calculated",
+            "name": "DeltaDay",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": [
+              " IF(",
+              "    ISBLANK(OrderShipmentRefusal[planned_shipping_date])=TRUE(),",
+              "    BLANK(),",
+              "    IF(",
+              "        ISBLANK(OrderShipmentRefusal[shipment_date])=TRUE(),",
+              "        BLANK(),",
+              "        DATEDIFF(OrderShipmentRefusal[planned_shipping_date],OrderShipmentRefusal[shipment_date],DAY)",
+              "        )",
+              "    )"
+            ]
+          },
+          {
+            "type": "calculated",
+            "name": "duplicates",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": [
+              " CALCULATE(",
+              "                COUNT(OrderShipmentRefusal[order_item_id]),",
+              "                ALLEXCEPT(OrderShipmentRefusal,OrderShipmentRefusal[DeltaDay],OrderShipmentRefusal[order_item_id],OrderShipmentRefusal[standard_id])",
+              "                )"
+            ]
+          },
+          {
+            "type": "calculated",
+            "name": "fillrate_order",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " 1"
+          },
+          {
+            "type": "calculated",
+            "name": "NumWeek",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " WEEKNUM(OrderShipmentRefusal[planned_shipping_date],21)"
+          },
+          {
+            "type": "calculated",
+            "name": "OrderFillRate",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": " DIVIDE(OrderShipmentRefusal[fillrate_order],OrderShipmentRefusal[duplicates]) "
+          },
+          {
+            "type": "calculated",
+            "name": "RefFillRate",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": " DIVIDE(OrderShipmentRefusal[fillare_refusal],OrderShipmentRefusal[duplicates])"
+          },
+          {
+            "type": "calculated",
+            "name": "ConfFillRate",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": " DIVIDE(OrderShipmentRefusal[fillrate_confirmed],OrderShipmentRefusal[duplicates])"
+          },
+          {
+            "type": "calculated",
+            "name": "YEAR",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " YEAR(OrderShipmentRefusal[planned_shipping_date])"
+          },
+          {
+            "type": "calculated",
+            "name": "MONTH",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " MONTH(OrderShipmentRefusal[planned_shipping_date])"
+          },
+          {
+            "name": "standard_article",
+            "dataType": "string",
+            "sourceColumn": "standard_article"
+          },
+          {
+            "name": "standard_brand_id",
+            "dataType": "int64",
+            "sourceColumn": "standard_brand_id"
+          },
+          {
+            "name": "standard_brand_title",
+            "dataType": "string",
+            "sourceColumn": "standard_brand_title"
+          },
+          {
+            "name": "operation_type",
+            "dataType": "string",
+            "sourceColumn": "operation_type"
+          },
+          {
+            "name": "conditional_execution_date",
+            "dataType": "dateTime",
+            "sourceColumn": "conditional_execution_date"
+          },
+          {
+            "name": "doc_date",
+            "dataType": "dateTime",
+            "sourceColumn": "doc_date"
+          },
+          {
+            "type": "calculated",
+            "name": "ПИ",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": [
+              " ",
+              "    IF(",
+              "        ISBLANK(",
+              "            RELATED('Тип номенклатуры'[standard_id])),",
+              "            \"ПИ\",",
+              "            \"ЛИ\"",
+              "    )"
+            ]
+          },
+          {
+            "type": "calculated",
+            "name": "Отклонение",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": [
+              " ",
+              "    IF(",
+              "        ISBLANK('OrderShipmentRefusal'[doc_date]),",
+              "        DATEDIFF(",
+              "            'OrderShipmentRefusal'[planned_shipping_date],",
+              "            TODAY(),",
+              "            DAY",
+              "        ),",
+              "        DATEDIFF(",
+              "            'OrderShipmentRefusal'[planned_shipping_date],",
+              "            'OrderShipmentRefusal'[doc_date],",
+              "            DAY",
+              "        )",
+              "    )"
+            ]
+          },
+          {
+            "name": "doc_quantity",
+            "dataType": "int64",
+            "sourceColumn": "doc_quantity"
+          },
+          {
+            "type": "calculated",
+            "name": "VX",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": [
+              " IF(",
+              "        ISBLANK(",
+              "            RELATED('VX_prod'[standard_id])",
+              "        ),",
+              "        \"\",",
+              "        \"VX\"",
+              "    )"
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "OrderShipmentRefusal",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": [
+                "SELECT ",
+                "o.id,",
+                "o.deal_id,",
+                "o.parent_id,",
+                "o.order_item_id,",
+                "o.customer_contractor_id,",
+                "o.customer_storage_id,",
+                "o.supplier_contractor_id,",
+                "o.supplier_storage_id,",
+                "o.standard_id,",
+                "o.standard_article,",
+                "o.standard_brand_id,",
+                "o.standard_brand_title,",
+                "o.order_status_id,",
+                "CASE ",
+                "WHEN o.order_discriminator='order' THEN 'Заказ'",
+                "WHEN o.order_discriminator='transit-order' THEN 'Транзит'",
+                "WHEN o.order_discriminator='transit-document-order' THEN 'Без заезда на склад'",
+                "WHEN o.order_discriminator='movement-order' THEN 'Внутреннее перемещение'",
+                "END AS order_discriminator,",
+                "o.order_item_date,",
+                "o.planned_shipping_date,",
+                "o.conditional_execution_date,",
+                "o.order_item_quantity,",
+                "o.order_item_amount,",
+                "ship.shipment_date,",
+                "ship.shipment_amount,",
+                "ship.shipment_quantity,",
+                "ref.reason_id,",
+                "ref.refusal_date,",
+                "ref.ref_quantity,",
+                "ref.ref_amount,",
+                "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
+                "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
+                "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
+                "ship.shipment_quantity /CAST(o.order_item_quantity AS float(8)) AS fillrate_shippment,",
+                "ref.ref_quantity /CAST(o.order_item_quantity AS float(8)) AS fillare_refusal,",
+                "IIF(ship.order_item_id IS NOT NULL, 'Отгрузка', IIF(ref.order_item_id IS NOT NULL,ref.type_ref, NULL )) AS operation_type",
+                "",
+                "FROM",
+                "\t(SELECT  ",
+                "\t\t\tord.id,",
+                "\t\t\tord.deal_id,",
+                "            ord.parent_id,",
+                "\t\t\tdoi.id AS order_item_id,",
+                "\t\t\tord.customer_contractor_id,",
+                "\t\t\tord.customer_storage_id,",
+                "\t\t\tord.supplier_contractor_id,",
+                "\t\t\tord.supplier_storage_id,",
+                "\t\t\tdoi.standard_id,",
+                "            doi.standard_article,",
+                "\t\t\tdoi.standard_brand_id,",
+                "\t\t\tdoi.standard_brand_title,",
+                "\t\t\tord.status_id AS order_status_id,",
+                "\t\t\tord.discriminator order_discriminator,",
+                "\t\t\tCAST(doi.created AS date) AS order_item_date,",
+                "\t\t\tCAST(ord.planned_shipping_date AS date) AS planned_shipping_date,",
+                "\t\t\tCAST(ord.conditional_execution_date AS date) AS conditional_execution_date,",
+                "\t\t\tdoi.quantity AS order_item_quantity,",
+                "\t\t\tdoi.amount AS order_item_amount",
+                "\t\t\tFROM reports_abom.dbo.document_order ord",
+                "\t\tLEFT JOIN reports_abom.dbo.document_order_item doi",
+                "\t\t\tON ord.id=doi.order_id) o",
+                "\tLEFT JOIN (SELECT ",
+                "\t\t\t\t\tsri.order_item_id,",
+                "\t\t\t\t\tMAX(sr.reason_id) AS reason_id,",
+                "\t\t\t\t\tMAX(CAST(sr.created AS date)) AS refusal_date,",
+                "\t\t\t\t\tSUM(sri.quantity) AS ref_quantity,",
+                "\t\t\t\t\tSUM(sri.amount) AS ref_amount,",
+                "\t\t\t\t\t'Отказ поставщика' AS type_ref",
+                "\t\t\t\tFROM reports_abom.dbo.document_supplier_refusal sr",
+                "\t\t\t\t\tLEFT JOIN reports_abom.dbo.document_supplier_refusal_item sri ",
+                "\t\t\t\t\t\tON sr.id=sri.refusal_id",
+                "\t\t\t\tGROUP BY sri.order_item_id",
+                "",
+                "\t\t\t\tUNION",
+                "",
+                "\t\t\t\tSELECT ",
+                "\t\t\t\t\tcri.order_item_id,",
+                "\t\t\t\t\tMAX(cr.reason_id) AS reason_id,",
+                "\t\t\t\t\tMAX(CAST(cr.created AS date)) AS refusal_date,",
+                "\t\t\t\t\tSUM(cri.quantity) AS ref_quantity,",
+                "\t\t\t\t\tSUM(cri.amount) AS ref_amount,",
+                "\t\t\t\t\t'Отказ покупателя' AS type_ref",
+                "\t\t\t\tFROM reports_abom.dbo.document_customer_refusal cr",
+                "\t\t\t\t\tLEFT JOIN reports_abom.dbo.document_customer_refusal_item cri ",
+                "\t\t\t\t\t\tON cr.id=cri.refusal_id",
+                "\t\t\t\tGROUP BY cri.order_item_id) ref",
+                "\t\t\tON o.order_item_id=ref.order_item_id",
+                "\tLEFT JOIN (SELECT  ",
+                "\t\t\t\t\torder_item_id,",
+                "\t\t\t\t\tCAST(created AS date) AS shipment_date,",
+                "\t\t\t\t\tamount AS shipment_amount,",
+                "\t\t\t\t\tquantity AS shipment_quantity",
+                "\t\t\t\tFROM reports_abom.dbo.document_shipment_item) ship",
+                "\t\t\tON o.order_item_id=ship.order_item_id"
+              ],
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT ",
+                  "o.id,",
+                  "o.deal_id,",
+                  "o.parent_id,",
+                  "o.order_item_id,",
+                  "o.customer_contractor_id,",
+                  "o.customer_storage_id,",
+                  "o.supplier_contractor_id,",
+                  "o.supplier_storage_id,",
+                  "o.standard_id,",
+                  "o.standard_article,",
+                  "o.standard_brand_id,",
+                  "o.standard_brand_title,",
+                  "o.order_status_id,",
+                  "CASE ",
+                  "WHEN o.order_discriminator='order' THEN 'Заказ'",
+                  "WHEN o.order_discriminator='transit-order' THEN 'Транзит'",
+                  "WHEN o.order_discriminator='transit-document-order' THEN 'Без заезда на склад'",
+                  "WHEN o.order_discriminator='movement-order' THEN 'Внутреннее перемещение'",
+                  "END AS order_discriminator,",
+                  "o.order_item_date,",
+                  "o.planned_shipping_date,",
+                  "o.conditional_execution_date,",
+                  "o.order_item_quantity,",
+                  "o.order_item_amount,",
+                  "ship.shipment_date,",
+                  "ship.shipment_amount,",
+                  "ship.shipment_quantity,",
+                  "ref.reason_id,",
+                  "ref.refusal_date,",
+                  "ref.ref_quantity,",
+                  "ref.ref_amount,",
+                  "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
+                  "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
+                  "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
+                  "ship.shipment_quantity /CAST(o.order_item_quantity AS float(8)) AS fillrate_shippment,",
+                  "ref.ref_quantity /CAST(o.order_item_quantity AS float(8)) AS fillare_refusal,",
+                  "IIF(ship.order_item_id IS NOT NULL, 'Отгрузка', IIF(ref.order_item_id IS NOT NULL,ref.type_ref, NULL )) AS operation_type",
+                  "",
+                  "FROM",
+                  "\t(SELECT  ",
+                  "\t\t\tord.id,",
+                  "\t\t\tord.deal_id,",
+                  "            ord.parent_id,",
+                  "\t\t\tdoi.id AS order_item_id,",
+                  "\t\t\tord.customer_contractor_id,",
+                  "\t\t\tord.customer_storage_id,",
+                  "\t\t\tord.supplier_contractor_id,",
+                  "\t\t\tord.supplier_storage_id,",
+                  "\t\t\tdoi.standard_id,",
+                  "            doi.standard_article,",
+                  "\t\t\tdoi.standard_brand_id,",
+                  "\t\t\tdoi.standard_brand_title,",
+                  "\t\t\tord.status_id AS order_status_id,",
+                  "\t\t\tord.discriminator order_discriminator,",
+                  "\t\t\tCAST(doi.created AS date) AS order_item_date,",
+                  "\t\t\tCAST(ord.planned_shipping_date AS date) AS planned_shipping_date,",
+                  "\t\t\tCAST(ord.conditional_execution_date AS date) AS conditional_execution_date,",
+                  "\t\t\tdoi.quantity AS order_item_quantity,",
+                  "\t\t\tdoi.amount AS order_item_amount",
+                  "\t\t\tFROM reports_abom.dbo.document_order ord",
+                  "\t\tLEFT JOIN reports_abom.dbo.document_order_item doi",
+                  "\t\t\tON ord.id=doi.order_id) o",
+                  "\tLEFT JOIN (SELECT ",
+                  "\t\t\t\t\tsri.order_item_id,",
+                  "\t\t\t\t\tMAX(sr.reason_id) AS reason_id,",
+                  "\t\t\t\t\tMAX(CAST(sr.created AS date)) AS refusal_date,",
+                  "\t\t\t\t\tSUM(sri.quantity) AS ref_quantity,",
+                  "\t\t\t\t\tSUM(sri.amount) AS ref_amount,",
+                  "\t\t\t\t\t'Отказ поставщика' AS type_ref",
+                  "\t\t\t\tFROM reports_abom.dbo.document_supplier_refusal sr",
+                  "\t\t\t\t\tLEFT JOIN reports_abom.dbo.document_supplier_refusal_item sri ",
+                  "\t\t\t\t\t\tON sr.id=sri.refusal_id",
+                  "\t\t\t\tGROUP BY sri.order_item_id",
+                  "",
+                  "\t\t\t\tUNION",
+                  "",
+                  "\t\t\t\tSELECT ",
+                  "\t\t\t\t\tcri.order_item_id,",
+                  "\t\t\t\t\tMAX(cr.reason_id) AS reason_id,",
+                  "\t\t\t\t\tMAX(CAST(cr.created AS date)) AS refusal_date,",
+                  "\t\t\t\t\tSUM(cri.quantity) AS ref_quantity,",
+                  "\t\t\t\t\tSUM(cri.amount) AS ref_amount,",
+                  "\t\t\t\t\t'Отказ покупателя' AS type_ref",
+                  "\t\t\t\tFROM reports_abom.dbo.document_customer_refusal cr",
+                  "\t\t\t\t\tLEFT JOIN reports_abom.dbo.document_customer_refusal_item cri ",
+                  "\t\t\t\t\t\tON cr.id=cri.refusal_id",
+                  "\t\t\t\tGROUP BY cri.order_item_id) ref",
+                  "\t\t\tON o.order_item_id=ref.order_item_id",
+                  "\tLEFT JOIN (SELECT  ",
+                  "\t\t\t\t\torder_item_id,",
+                  "\t\t\t\t\tCAST(created AS date) AS shipment_date,",
+                  "\t\t\t\t\tamount AS shipment_amount,",
+                  "\t\t\t\t\tquantity AS shipment_quantity",
+                  "\t\t\t\tFROM reports_abom.dbo.document_shipment_item) ship",
+                  "\t\t\tON o.order_item_id=ship.order_item_id</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECT ",
+              "o.id,",
+              "o.deal_id,",
+              "o.parent_id,",
+              "o.order_item_id,",
+              "o.customer_contractor_id,",
+              "o.customer_storage_id,",
+              "o.supplier_contractor_id,",
+              "o.supplier_storage_id,",
+              "o.standard_id,",
+              "o.standard_article,",
+              "o.standard_brand_id,",
+              "o.standard_brand_title,",
+              "o.order_status_id,",
+              "CASE ",
+              "WHEN o.order_discriminator='order' THEN 'Заказ'",
+              "WHEN o.order_discriminator='transit-order' THEN 'Транзит'",
+              "WHEN o.order_discriminator='transit-document-order' THEN 'Без заезда на склад'",
+              "WHEN o.order_discriminator='movement-order' THEN 'Внутреннее перемещение'",
+              "END AS order_discriminator,",
+              "o.order_item_date,",
+              "o.planned_shipping_date,",
+              "o.conditional_execution_date,",
+              "o.order_item_quantity,",
+              "o.order_item_amount,",
+              "ship.shipment_date,",
+              "ship.shipment_amount,",
+              "ship.shipment_quantity,",
+              "ref.reason_id,",
+              "ref.refusal_date,",
+              "ref.ref_quantity,",
+              "ref.ref_amount,",
+              "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
+              "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
+              "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
+              "ship.shipment_quantity /CAST(o.order_item_quantity AS float(8)) AS fillrate_shippment,",
+              "ref.ref_quantity /CAST(o.order_item_quantity AS float(8)) AS fillare_refusal,",
+              "IIF(ship.order_item_id IS NOT NULL, 'Отгрузка', IIF(ref.order_item_id IS NOT NULL,ref.type_ref, NULL )) AS operation_type",
+              "",
+              "FROM",
+              "\t(SELECT  ",
+              "\t\t\tord.id,",
+              "\t\t\tord.deal_id,",
+              "            ord.parent_id,",
+              "\t\t\tdoi.id AS order_item_id,",
+              "\t\t\tord.customer_contractor_id,",
+              "\t\t\tord.customer_storage_id,",
+              "\t\t\tord.supplier_contractor_id,",
+              "\t\t\tord.supplier_storage_id,",
+              "\t\t\tdoi.standard_id,",
+              "            doi.standard_article,",
+              "\t\t\tdoi.standard_brand_id,",
+              "\t\t\tdoi.standard_brand_title,",
+              "\t\t\tord.status_id AS order_status_id,",
+              "\t\t\tord.discriminator order_discriminator,",
+              "\t\t\tCAST(doi.created AS date) AS order_item_date,",
+              "\t\t\tCAST(ord.planned_shipping_date AS date) AS planned_shipping_date,",
+              "\t\t\tCAST(ord.conditional_execution_date AS date) AS conditional_execution_date,",
+              "\t\t\tdoi.quantity AS order_item_quantity,",
+              "\t\t\tdoi.amount AS order_item_amount",
+              "\t\t\tFROM reports_abom.dbo.document_order ord",
+              "\t\tLEFT JOIN reports_abom.dbo.document_order_item doi",
+              "\t\t\tON ord.id=doi.order_id) o",
+              "\tLEFT JOIN (SELECT ",
+              "\t\t\t\t\tsri.order_item_id,",
+              "\t\t\t\t\tMAX(sr.reason_id) AS reason_id,",
+              "\t\t\t\t\tMAX(CAST(sr.created AS date)) AS refusal_date,",
+              "\t\t\t\t\tSUM(sri.quantity) AS ref_quantity,",
+              "\t\t\t\t\tSUM(sri.amount) AS ref_amount,",
+              "\t\t\t\t\t'Отказ поставщика' AS type_ref",
+              "\t\t\t\tFROM reports_abom.dbo.document_supplier_refusal sr",
+              "\t\t\t\t\tLEFT JOIN reports_abom.dbo.document_supplier_refusal_item sri ",
+              "\t\t\t\t\t\tON sr.id=sri.refusal_id",
+              "\t\t\t\tGROUP BY sri.order_item_id",
+              "",
+              "\t\t\t\tUNION",
+              "",
+              "\t\t\t\tSELECT ",
+              "\t\t\t\t\tcri.order_item_id,",
+              "\t\t\t\t\tMAX(cr.reason_id) AS reason_id,",
+              "\t\t\t\t\tMAX(CAST(cr.created AS date)) AS refusal_date,",
+              "\t\t\t\t\tSUM(cri.quantity) AS ref_quantity,",
+              "\t\t\t\t\tSUM(cri.amount) AS ref_amount,",
+              "\t\t\t\t\t'Отказ покупателя' AS type_ref",
+              "\t\t\t\tFROM reports_abom.dbo.document_customer_refusal cr",
+              "\t\t\t\t\tLEFT JOIN reports_abom.dbo.document_customer_refusal_item cri ",
+              "\t\t\t\t\t\tON cr.id=cri.refusal_id",
+              "\t\t\t\tGROUP BY cri.order_item_id) ref",
+              "\t\t\tON o.order_item_id=ref.order_item_id",
+              "\tLEFT JOIN (SELECT  ",
+              "\t\t\t\t\torder_item_id,",
+              "\t\t\t\t\tCAST(created AS date) AS shipment_date,",
+              "\t\t\t\t\tamount AS shipment_amount,",
+              "\t\t\t\t\tquantity AS shipment_quantity",
+              "\t\t\t\tFROM reports_abom.dbo.document_shipment_item) ship",
+              "\t\t\tON o.order_item_id=ship.order_item_id"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "OrderShipmentRefusal"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT ",
+              "o.id,",
+              "o.deal_id,",
+              "o.parent_id,",
+              "o.order_item_id,",
+              "o.customer_contractor_id,",
+              "o.customer_storage_id,",
+              "o.supplier_contractor_id,",
+              "o.supplier_storage_id,",
+              "o.standard_id,",
+              "o.standard_article,",
+              "o.standard_brand_id,",
+              "o.standard_brand_title,",
+              "o.order_status_id,",
+              "CASE ",
+              "WHEN o.order_discriminator='order' THEN 'Заказ'",
+              "WHEN o.order_discriminator='transit-order' THEN 'Транзит'",
+              "WHEN o.order_discriminator='transit-document-order' THEN 'Без заезда на склад'",
+              "WHEN o.order_discriminator='movement-order' THEN 'Внутреннее перемещение'",
+              "END AS order_discriminator,",
+              "o.order_item_date,",
+              "o.planned_shipping_date,",
+              "o.conditional_execution_date,",
+              "o.order_item_quantity,",
+              "o.order_item_amount,",
+              "ship.shipment_date,",
+              "ship.shipment_amount,",
+              "ship.shipment_quantity,",
+              "ref.reason_id,",
+              "ref.refusal_date,",
+              "ref.ref_quantity,",
+              "ref.ref_amount,",
+              "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
+              "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
+              "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
+              "ship.shipment_quantity /CAST(o.order_item_quantity AS float(8)) AS fillrate_shippment,",
+              "ref.ref_quantity /CAST(o.order_item_quantity AS float(8)) AS fillare_refusal,",
+              "IIF(ship.order_item_id IS NOT NULL, 'Отгрузка', IIF(ref.order_item_id IS NOT NULL,ref.type_ref, NULL )) AS operation_type",
+              "",
+              "FROM",
+              "\t(SELECT  ",
+              "\t\t\tord.id,",
+              "\t\t\tord.deal_id,",
+              "            ord.parent_id,",
+              "\t\t\tdoi.id AS order_item_id,",
+              "\t\t\tord.customer_contractor_id,",
+              "\t\t\tord.customer_storage_id,",
+              "\t\t\tord.supplier_contractor_id,",
+              "\t\t\tord.supplier_storage_id,",
+              "\t\t\tdoi.standard_id,",
+              "            doi.standard_article,",
+              "\t\t\tdoi.standard_brand_id,",
+              "\t\t\tdoi.standard_brand_title,",
+              "\t\t\tord.status_id AS order_status_id,",
+              "\t\t\tord.discriminator order_discriminator,",
+              "\t\t\tCAST(doi.created AS date) AS order_item_date,",
+              "\t\t\tCAST(ord.planned_shipping_date AS date) AS planned_shipping_date,",
+              "\t\t\tCAST(ord.conditional_execution_date AS date) AS conditional_execution_date,",
+              "\t\t\tdoi.quantity AS order_item_quantity,",
+              "\t\t\tdoi.amount AS order_item_amount",
+              "\t\t\tFROM reports_abom.dbo.document_order ord",
+              "\t\tLEFT JOIN reports_abom.dbo.document_order_item doi",
+              "\t\t\tON ord.id=doi.order_id) o",
+              "\tLEFT JOIN (SELECT ",
+              "\t\t\t\t\tsri.order_item_id,",
+              "\t\t\t\t\tMAX(sr.reason_id) AS reason_id,",
+              "\t\t\t\t\tMAX(CAST(sr.created AS date)) AS refusal_date,",
+              "\t\t\t\t\tSUM(sri.quantity) AS ref_quantity,",
+              "\t\t\t\t\tSUM(sri.amount) AS ref_amount,",
+              "\t\t\t\t\t'Отказ поставщика' AS type_ref",
+              "\t\t\t\tFROM reports_abom.dbo.document_supplier_refusal sr",
+              "\t\t\t\t\tLEFT JOIN reports_abom.dbo.document_supplier_refusal_item sri ",
+              "\t\t\t\t\t\tON sr.id=sri.refusal_id",
+              "\t\t\t\tGROUP BY sri.order_item_id",
+              "",
+              "\t\t\t\tUNION",
+              "",
+              "\t\t\t\tSELECT ",
+              "\t\t\t\t\tcri.order_item_id,",
+              "\t\t\t\t\tMAX(cr.reason_id) AS reason_id,",
+              "\t\t\t\t\tMAX(CAST(cr.created AS date)) AS refusal_date,",
+              "\t\t\t\t\tSUM(cri.quantity) AS ref_quantity,",
+              "\t\t\t\t\tSUM(cri.amount) AS ref_amount,",
+              "\t\t\t\t\t'Отказ покупателя' AS type_ref",
+              "\t\t\t\tFROM reports_abom.dbo.document_customer_refusal cr",
+              "\t\t\t\t\tLEFT JOIN reports_abom.dbo.document_customer_refusal_item cri ",
+              "\t\t\t\t\t\tON cr.id=cri.refusal_id",
+              "\t\t\t\tGROUP BY cri.order_item_id) ref",
+              "\t\t\tON o.order_item_id=ref.order_item_id",
+              "\tLEFT JOIN (SELECT  ",
+              "\t\t\t\t\torder_item_id,",
+              "\t\t\t\t\tCAST(created AS date) AS shipment_date,",
+              "\t\t\t\t\tamount AS shipment_amount,",
+              "\t\t\t\t\tquantity AS shipment_quantity",
+              "\t\t\t\tFROM reports_abom.dbo.document_shipment_item) ship",
+              "\t\t\tON o.order_item_id=ship.order_item_id</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Customer",
+        "columns": [
+          {
+            "name": "id",
+            "dataType": "int64",
+            "sourceColumn": "id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "title",
+            "dataType": "string",
+            "sourceColumn": "title",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "discriminator",
+            "dataType": "string",
+            "sourceColumn": "discriminator",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "correct_b2b",
+            "dataType": "int64",
+            "sourceColumn": "correct_b2b",
+            "sourceProviderType": "UnsignedTinyInt"
+          },
+          {
+            "name": "contractor_subtype_id",
+            "dataType": "int64",
+            "sourceColumn": "contractor_subtype_id",
+            "sourceProviderType": "Integer"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Customer",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": [
+                "SELECT ",
+                "id,",
+                "title,",
+                "CASE",
+                "WHEN discriminator='shop' THEN 'Магазин'",
+                "WHEN discriminator='distributor' THEN 'Дистрибьютор'",
+                "WHEN discriminator='portal_representative' THEN 'Представитель портала'",
+                "WHEN discriminator='supplier' THEN 'Поставщик'",
+                "END discriminator,",
+                "correct_b2b,",
+                "contractor_subtype_id",
+                "FROM reports_abom.dbo.contractor"
+              ],
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT ",
+                  "id,",
+                  "title,",
+                  "CASE",
+                  "WHEN discriminator='shop' THEN 'Магазин'",
+                  "WHEN discriminator='distributor' THEN 'Дистрибьютор'",
+                  "WHEN discriminator='portal_representative' THEN 'Представитель портала'",
+                  "WHEN discriminator='supplier' THEN 'Поставщик'",
+                  "END discriminator,",
+                  "correct_b2b,",
+                  "contractor_subtype_id",
+                  "FROM reports_abom.dbo.contractor</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECT ",
+              "id,",
+              "title,",
+              "CASE",
+              "WHEN discriminator='shop' THEN 'Магазин'",
+              "WHEN discriminator='distributor' THEN 'Дистрибьютор'",
+              "WHEN discriminator='portal_representative' THEN 'Представитель портала'",
+              "WHEN discriminator='supplier' THEN 'Поставщик'",
+              "END discriminator,",
+              "correct_b2b,",
+              "contractor_subtype_id",
+              "FROM reports_abom.dbo.contractor"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Customer"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT ",
+              "id,",
+              "title,",
+              "CASE",
+              "WHEN discriminator='shop' THEN 'Магазин'",
+              "WHEN discriminator='distributor' THEN 'Дистрибьютор'",
+              "WHEN discriminator='portal_representative' THEN 'Представитель портала'",
+              "WHEN discriminator='supplier' THEN 'Поставщик'",
+              "END discriminator,",
+              "correct_b2b,",
+              "contractor_subtype_id",
+              "FROM reports_abom.dbo.contractor</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "measure",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[id]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "title",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[title]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "discriminator",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[discriminator]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "correct_b2b",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[correct_b2b]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "contractor_subtype_id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[contractor_subtype_id]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "Customer"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "OrderFillRateM",
+            "expression": " Sum(OrderShipmentRefusal[OrderFillRate])"
+          },
+          {
+            "name": "RefusalFillRateM",
+            "expression": " SUM(OrderShipmentRefusal[RefFillRate])"
+          },
+          {
+            "name": "ConfirmedFillRateM",
+            "expression": " SUM(OrderShipmentRefusal[ConfFillRate])"
+          },
+          {
+            "name": "ShippmentFillRateM",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[fillrate_shippment]))"
+          },
+          {
+            "name": "ShippedOnTimeM",
+            "expression": [
+              " ",
+              "    CALCULATE(",
+              "        [ShippmentFillRateM],",
+              "        OrderShipmentRefusal[DeltaDay]<=0)"
+            ]
+          },
+          {
+            "name": "NotShippedOnTimeM",
+            "expression": [
+              " ",
+              "    CALCULATE(",
+              "        [ShippmentFillRateM],",
+              "        OrderShipmentRefusal[DeltaDay]>0)"
+            ]
+          },
+          {
+            "name": "not executedM",
+            "expression": " IF(ISBLANK([ShippmentFillRateM])=TRUE,[ConfirmedFillRateM],[ConfirmedFillRateM]-[ShippmentFillRateM])",
+            "formatString": "0"
+          },
+          {
+            "name": "Delayed7",
+            "expression": [
+              " ",
+              "    VAR a = [ConfirmedFillRateM]",
+              "    VAR b = CALCULATE(",
+              "        [ShippmentFillRateM],",
+              "        OrderShipmentRefusal[DeltaDay]>7",
+              "    )",
+              "    RETURN ",
+              "        IF(DIVIDE(b,a)>1,1,",
+              "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
+            ],
+            "formatString": "0%;-0%;0%"
+          },
+          {
+            "name": "Delayed3to7",
+            "expression": [
+              " ",
+              "    VAR a = [ConfirmedFillRateM]",
+              "    VAR b = CALCULATE(",
+              "        [ShippmentFillRateM],",
+              "        OrderShipmentRefusal[DeltaDay]>3,",
+              "        OrderShipmentRefusal[DeltaDay]<=7)",
+              "    RETURN",
+              "        IF(DIVIDE(b,a)>1,1,",
+              "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
+            ],
+            "formatString": "0%;-0%;0%"
+          },
+          {
+            "name": "Delayed1to3",
+            "expression": [
+              " ",
+              "    VAR a = [ConfirmedFillRateM]",
+              "    VAR b = CALCULATE(",
+              "        [ShippmentFillRateM],",
+              "        OrderShipmentRefusal[DeltaDay]>0,",
+              "        OrderShipmentRefusal[DeltaDay]<=3)",
+              "    RETURN     ",
+              "        IF(DIVIDE(b,a)>1,1,",
+              "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
+            ],
+            "formatString": "0%;-0%;0%"
+          },
+          {
+            "name": "ConfirmedQuantity",
+            "expression": " SUM(OrderShipmentRefusal[order_item_quantity])-SUM(OrderShipmentRefusal[ref_quantity])"
+          },
+          {
+            "name": "%not_executeM",
+            "expression": [
+              " ",
+              "    IF(DIVIDE([not executedM],[ConfirmedFillRateM])>1,1,",
+              "        IF(DIVIDE([not executedM],[ConfirmedFillRateM])<0,0,DIVIDE([not executedM],[ConfirmedFillRateM])))"
+            ],
+            "formatString": "0%;-0%;0%"
+          },
+          {
+            "name": "ServiseRateM",
+            "expression": [
+              " ",
+              "    VAR a = [ConfirmedFillRateM]",
+              "    VAR b = CALCULATE(",
+              "        [ShippmentFillRateM],OrderShipmentRefusal[DeltaDay]<=0)",
+              "    RETURN IF(DIVIDE(b,a)>1,1,",
+              "        IF(DIVIDE(b,a)<0,0,DIVIDE(b,a))",
+              ")"
+            ],
+            "formatString": "0%;-0%;0%"
+          },
+          {
+            "name": "%RefusalFillRateM",
+            "expression": " 'measure'[RefusalFillRateM] / 'measure'[OrderFillRateM]",
+            "formatString": "0%;-0%;0%"
+          },
+          {
+            "name": "К исполнению",
+            "expression": " [OrderFillRateM] - [RefusalFillRateM]"
+          },
+          {
+            "name": "Сумма отгрузок в срок",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[shipment_amount]), OrderShipmentRefusal[DeltaDay]<=0)"
+          },
+          {
+            "name": "Сумма отгрузок с задержкой до 3х дней",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[shipment_amount]), OrderShipmentRefusal[DeltaDay]>0, OrderShipmentRefusal[DeltaDay]<=3)"
+          },
+          {
+            "name": "Сумма отгрузок с задержкой от 3х до 7 дней",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[shipment_amount]), OrderShipmentRefusal[DeltaDay]>3, OrderShipmentRefusal[DeltaDay]<=7)"
+          },
+          {
+            "name": "Сумма отгрузок с задержкой больше 7 дней",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[shipment_amount]), OrderShipmentRefusal[DeltaDay]>7)"
+          },
+          {
+            "name": "Сумма отказов",
+            "expression": " SUM(OrderShipmentRefusal[ref_amount])"
+          },
+          {
+            "name": "Сумма заказов",
+            "expression": " SUM(OrderShipmentRefusal[order_item_amount])"
+          },
+          {
+            "name": "Сумма отгрузок",
+            "expression": " SUM(OrderShipmentRefusal[shipment_amount])"
+          },
+          {
+            "name": "Сумма неисполнения",
+            "expression": " IF(([Сумма заказов] - [Сумма отгрузок] - [Сумма отказов]) < 0, 0, [Сумма заказов] - [Сумма отгрузок] - [Сумма отказов])"
+          }
+        ]
+      },
+      {
+        "name": "Supplier",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[id]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "title",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[title]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "discriminator",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[discriminator]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "correct_b2b",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[correct_b2b]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "contractor_subtype_id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[contractor_subtype_id]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "Customer"
+            }
+          }
+        ]
+      },
+      {
+        "name": "ParentCustomer",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[id]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "title",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[title]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "discriminator",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[discriminator]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "correct_b2b",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[correct_b2b]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "contractor_subtype_id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[contractor_subtype_id]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "Customer"
+            }
+          }
+        ]
+      },
+      {
+        "name": "ParentSupplier",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[id]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "title",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[title]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "discriminator",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[discriminator]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "correct_b2b",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[correct_b2b]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "contractor_subtype_id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "Customer[contractor_subtype_id]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "Customer"
+            }
+          }
+        ]
+      },
+      {
+        "name": "parentOrder",
+        "columns": [
+          {
+            "name": "id",
+            "dataType": "int64",
+            "sourceColumn": "id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "customer_contractor_id",
+            "dataType": "int64",
+            "sourceColumn": "customer_contractor_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "supplier_contractor_id",
+            "dataType": "int64",
+            "sourceColumn": "supplier_contractor_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "customer_storage_id",
+            "dataType": "int64",
+            "sourceColumn": "customer_storage_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "supplier_storage_id",
+            "dataType": "int64",
+            "sourceColumn": "supplier_storage_id",
+            "sourceProviderType": "Integer"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "parentOrder",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": [
+                "SELECT [id]",
+                "      ,[customer_contractor_id]",
+                "      ,[supplier_contractor_id]",
+                "      ,[customer_storage_id]",
+                "      ,[supplier_storage_id]",
+                "  FROM [reports_abom].[dbo].[document_order]"
+              ],
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT [id]",
+                  "      ,[customer_contractor_id]",
+                  "      ,[supplier_contractor_id]",
+                  "      ,[customer_storage_id]",
+                  "      ,[supplier_storage_id]",
+                  "  FROM [reports_abom].[dbo].[document_order]</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECT [id]",
+              "      ,[customer_contractor_id]",
+              "      ,[supplier_contractor_id]",
+              "      ,[customer_storage_id]",
+              "      ,[supplier_storage_id]",
+              "  FROM [reports_abom].[dbo].[document_order]"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "parentOrder"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT [id]",
+              "      ,[customer_contractor_id]",
+              "      ,[supplier_contractor_id]",
+              "      ,[customer_storage_id]",
+              "      ,[supplier_storage_id]",
+              "  FROM [reports_abom].[dbo].[document_order]</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "custome_storage",
+        "columns": [
+          {
+            "name": "id",
+            "dataType": "int64",
+            "sourceColumn": "id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "title",
+            "dataType": "string",
+            "sourceColumn": "title",
+            "sourceProviderType": "VarChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "custome_storage",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": [
+                "SELECT [id]",
+                "      ,[title]",
+                "  FROM [reports_abom].[dbo].[storage]"
+              ],
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT [id]",
+                  "      ,[title]",
+                  "  FROM [reports_abom].[dbo].[storage]</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECT [id]",
+              "      ,[title]",
+              "  FROM [reports_abom].[dbo].[storage]"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "custome_storage"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT [id]",
+              "      ,[title]",
+              "  FROM [reports_abom].[dbo].[storage]</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "custome_storage_parent",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "custome_storage[id]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "title",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "custome_storage[title]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "custome_storage"
+            }
+          }
+        ]
+      },
+      {
+        "name": "supplier_storage_parent",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "custome_storage[id]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "title",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "custome_storage[title]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "custome_storage"
+            }
+          }
+        ]
+      },
+      {
+        "name": "supplier_storage",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "id",
+            "dataType": "int64",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "custome_storage[id]"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "title",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "custome_storage[title]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "custome_storage"
+            }
+          }
+        ]
+      },
+      {
+        "name": "refusal_reason",
+        "columns": [
+          {
+            "name": "id",
+            "dataType": "int64",
+            "sourceColumn": "id",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "discriminator",
+            "dataType": "string",
+            "sourceColumn": "discriminator",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "title",
+            "dataType": "string",
+            "sourceColumn": "title",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "refusal_reason",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " SELECT [dbo].[refusal_reason].[id],[dbo].[refusal_reason].[discriminator],[dbo].[refusal_reason].[title] FROM [dbo].[refusal_reason] ",
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            },
+            "annotations": [
+              {
+                "name": "TableWidgetSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"TableWidgetSerialization\"><AnnotationContent><![CDATA[<?xml version=\"1.0\"?>",
+                  "<TableWidgetGridSerialization xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">",
+                  "  <ColumnSuggestedType />",
+                  "  <ColumnFormat />",
+                  "  <ColumnAccuracy />",
+                  "  <ColumnCurrencySymbol />",
+                  "  <ColumnPositivePattern />",
+                  "  <ColumnNegativePattern />",
+                  "  <ColumnWidths>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>id</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>52</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>discriminator</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>128</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>title</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>120</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>available_selection</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>191</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>status_id</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>119</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>created</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>123</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>updated</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>132</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>deleted</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>144</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>created_by</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>85</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>updated_by</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>88</int>",
+                  "      </value>",
+                  "    </item>",
+                  "  </ColumnWidths>",
+                  "  <ColumnDisplayIndex>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>id</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>0</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>discriminator</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>1</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>title</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>2</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>available_selection</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>3</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>status_id</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>4</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>created</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>5</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>updated</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>6</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>deleted</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>7</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>created_by</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>8</int>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>updated_by</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <int>9</int>",
+                  "      </value>",
+                  "    </item>",
+                  "  </ColumnDisplayIndex>",
+                  "  <ColumnFrozen />",
+                  "  <ColumnChecked>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>deleted</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <boolean>false</boolean>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>created_by</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <boolean>false</boolean>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>updated_by</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <boolean>false</boolean>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>updated</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <boolean>false</boolean>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>created</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <boolean>false</boolean>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>available_selection</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <boolean>false</boolean>",
+                  "      </value>",
+                  "    </item>",
+                  "    <item>",
+                  "      <key>",
+                  "        <string>status_id</string>",
+                  "      </key>",
+                  "      <value>",
+                  "        <boolean>false</boolean>",
+                  "      </value>",
+                  "    </item>",
+                  "  </ColumnChecked>",
+                  "  <ColumnFilter />",
+                  "  <SelectionFilter />",
+                  "  <FilterParameters />",
+                  "  <IsSortDescending>false</IsSortDescending>",
+                  "</TableWidgetGridSerialization>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[refusal_reason].[id],[dbo].[refusal_reason].[discriminator],[dbo].[refusal_reason].[title] FROM [dbo].[refusal_reason] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "refusal_reason"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          },
+          {
+            "name": "TableWidgetSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"TableWidgetSerialization\"><AnnotationContent><![CDATA[<?xml version=\"1.0\"?>",
+              "<TableWidgetGridSerialization xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">",
+              "  <ColumnSuggestedType />",
+              "  <ColumnFormat />",
+              "  <ColumnAccuracy />",
+              "  <ColumnCurrencySymbol />",
+              "  <ColumnPositivePattern />",
+              "  <ColumnNegativePattern />",
+              "  <ColumnWidths>",
+              "    <item>",
+              "      <key>",
+              "        <string>id</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>52</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>discriminator</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>128</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>title</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>120</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>available_selection</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>191</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>status_id</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>119</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>created</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>123</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>updated</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>132</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>deleted</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>144</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>created_by</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>85</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>updated_by</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>88</int>",
+              "      </value>",
+              "    </item>",
+              "  </ColumnWidths>",
+              "  <ColumnDisplayIndex>",
+              "    <item>",
+              "      <key>",
+              "        <string>id</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>0</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>discriminator</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>1</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>title</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>2</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>available_selection</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>3</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>status_id</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>4</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>created</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>5</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>updated</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>6</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>deleted</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>7</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>created_by</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>8</int>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>updated_by</string>",
+              "      </key>",
+              "      <value>",
+              "        <int>9</int>",
+              "      </value>",
+              "    </item>",
+              "  </ColumnDisplayIndex>",
+              "  <ColumnFrozen />",
+              "  <ColumnChecked>",
+              "    <item>",
+              "      <key>",
+              "        <string>deleted</string>",
+              "      </key>",
+              "      <value>",
+              "        <boolean>false</boolean>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>created_by</string>",
+              "      </key>",
+              "      <value>",
+              "        <boolean>false</boolean>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>updated_by</string>",
+              "      </key>",
+              "      <value>",
+              "        <boolean>false</boolean>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>updated</string>",
+              "      </key>",
+              "      <value>",
+              "        <boolean>false</boolean>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>created</string>",
+              "      </key>",
+              "      <value>",
+              "        <boolean>false</boolean>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>available_selection</string>",
+              "      </key>",
+              "      <value>",
+              "        <boolean>false</boolean>",
+              "      </value>",
+              "    </item>",
+              "    <item>",
+              "      <key>",
+              "        <string>status_id</string>",
+              "      </key>",
+              "      <value>",
+              "        <boolean>false</boolean>",
+              "      </value>",
+              "    </item>",
+              "  </ColumnChecked>",
+              "  <ColumnFilter />",
+              "  <SelectionFilter />",
+              "  <FilterParameters />",
+              "  <IsSortDescending>false</IsSortDescending>",
+              "</TableWidgetGridSerialization>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "standard",
+        "columns": [
+          {
+            "name": "id",
+            "dataType": "int64",
+            "sourceColumn": "id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "title",
+            "dataType": "string",
+            "sourceColumn": "title",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "article",
+            "dataType": "string",
+            "sourceColumn": "article",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "barcode",
+            "dataType": "string",
+            "sourceColumn": "barcode",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "quantity_type_id",
+            "dataType": "int64",
+            "sourceColumn": "quantity_type_id",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "length",
+            "dataType": "double",
+            "sourceColumn": "length",
+            "sourceProviderType": "Double"
+          },
+          {
+            "name": "height",
+            "dataType": "double",
+            "sourceColumn": "height",
+            "sourceProviderType": "Double"
+          },
+          {
+            "name": "width",
+            "dataType": "double",
+            "sourceColumn": "width",
+            "sourceProviderType": "Double"
+          },
+          {
+            "name": "weight",
+            "dataType": "double",
+            "sourceColumn": "weight",
+            "sourceProviderType": "Double"
+          },
+          {
+            "name": "multiplicity",
+            "dataType": "int64",
+            "sourceColumn": "multiplicity",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "zone_id",
+            "dataType": "int64",
+            "sourceColumn": "zone_id",
+            "sourceProviderType": "SmallInt"
+          },
+          {
+            "name": "zone_title",
+            "dataType": "string",
+            "sourceColumn": "zone_title",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "original_sign",
+            "dataType": "double",
+            "sourceColumn": "original_sign",
+            "sourceProviderType": "Double"
+          },
+          {
+            "name": "file_id",
+            "dataType": "int64",
+            "sourceColumn": "file_id",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "description",
+            "dataType": "string",
+            "sourceColumn": "description",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "certificate_id",
+            "dataType": "int64",
+            "sourceColumn": "certificate_id",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "category_id",
+            "dataType": "int64",
+            "sourceColumn": "category_id",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "productor_id",
+            "dataType": "int64",
+            "sourceColumn": "productor_id",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "brand_id",
+            "dataType": "int64",
+            "sourceColumn": "brand_id",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "brand_title",
+            "dataType": "string",
+            "sourceColumn": "brand_title",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "contract_type",
+            "dataType": "string",
+            "sourceColumn": "contract_type",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "product_group",
+            "dataType": "string",
+            "sourceColumn": "product_group",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "twoness_id",
+            "dataType": "int64",
+            "sourceColumn": "twoness_id",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "parent_id_synonym",
+            "dataType": "int64",
+            "sourceColumn": "parent_id_synonym",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "created",
+            "dataType": "dateTime",
+            "sourceColumn": "created",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "updated",
+            "dataType": "dateTime",
+            "sourceColumn": "updated",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "deleted",
+            "dataType": "dateTime",
+            "sourceColumn": "deleted",
+            "formatString": "General Date",
+            "sourceProviderType": "DBTimeStamp"
+          },
+          {
+            "name": "created_by",
+            "dataType": "int64",
+            "sourceColumn": "created_by",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "updated_by",
+            "dataType": "int64",
+            "sourceColumn": "updated_by",
+            "sourceProviderType": "BigInt"
+          },
+          {
+            "name": "is_belong_main_regulation",
+            "dataType": "int64",
+            "sourceColumn": "is_belong_main_regulation",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "reqzone_id",
+            "dataType": "int64",
+            "sourceColumn": "reqzone_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "is_has_recommended",
+            "dataType": "int64",
+            "sourceColumn": "is_has_recommended",
+            "sourceProviderType": "SmallInt"
+          },
+          {
+            "name": "is_marked",
+            "dataType": "boolean",
+            "sourceColumn": "is_marked",
+            "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
+            "sourceProviderType": "Boolean"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "standard",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": " SELECT [dbo].[standard].* FROM [dbo].[standard] ",
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[standard].* FROM [dbo].[standard] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "standard"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "Тип номенклатуры",
+        "columns": [
+          {
+            "name": "standard_id",
+            "dataType": "int64",
+            "sourceColumn": "standard_id",
+            "sourceProviderType": "BigInt"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Тип номенклатуры",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": [
+                "SELECT standard_id FROM reports_abom.dbo.price_list_item",
+                "WHERE price_list_id=1",
+                "ORDER BY standard_id ASC"
+              ],
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT standard_id FROM reports_abom.dbo.price_list_item",
+                  "WHERE price_list_id=1",
+                  "ORDER BY standard_id ASC</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECT standard_id FROM reports_abom.dbo.price_list_item",
+              "WHERE price_list_id=1",
+              "ORDER BY standard_id ASC"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Тип номенклатуры"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT standard_id FROM reports_abom.dbo.price_list_item",
+              "WHERE price_list_id=1",
+              "ORDER BY standard_id ASC</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "VX_prod",
+        "columns": [
+          {
+            "name": "standard_id",
+            "dataType": "int64",
+            "sourceColumn": "standard_id"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "VX_prod",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": [
+                "SELECT s.id AS standard_id FROM reports_abom.dbo.standard_sign_relation AS ssr",
+                "LEFT JOIN reports_abom.dbo.standard AS s ON s.id = ssr.standard_id",
+                "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ss.id = ssr.sign_id",
+                "WHERE ss.id = 32",
+                "ORDER BY s.id ASC"
+              ],
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT s.id AS standard_id FROM reports_abom.dbo.standard_sign_relation AS ssr",
+                  "LEFT JOIN reports_abom.dbo.standard AS s ON s.id = ssr.standard_id",
+                  "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ss.id = ssr.sign_id",
+                  "WHERE ss.id = 32",
+                  "ORDER BY s.id ASC</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECT s.id AS standard_id FROM reports_abom.dbo.standard_sign_relation AS ssr",
+              "LEFT JOIN reports_abom.dbo.standard AS s ON s.id = ssr.standard_id",
+              "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ss.id = ssr.sign_id",
+              "WHERE ss.id = 32",
+              "ORDER BY s.id ASC"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "VX_prod"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT s.id AS standard_id FROM reports_abom.dbo.standard_sign_relation AS ssr",
+              "LEFT JOIN reports_abom.dbo.standard AS s ON s.id = ssr.standard_id",
+              "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ss.id = ssr.sign_id",
+              "WHERE ss.id = 32",
+              "ORDER BY s.id ASC</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "7fdc49b8-a4fa-4c14-a5a5-c87dffe909ba",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "customer_contractor_id",
+        "toTable": "Customer",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "db3707b3-9833-426f-96da-20ac4c16911c",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "supplier_contractor_id",
+        "toTable": "Supplier",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "706f77e3-bea3-411b-9a60-97447228c8ad",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "parent_id",
+        "toTable": "parentOrder",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "894cf867-367a-482a-b23a-79470672d8da",
+        "fromTable": "parentOrder",
+        "fromColumn": "supplier_contractor_id",
+        "toTable": "ParentSupplier",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "2da7b6a2-45b4-4797-a145-7e5719f50166",
+        "fromTable": "parentOrder",
+        "fromColumn": "customer_contractor_id",
+        "toTable": "ParentCustomer",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "7efe917d-c9da-48db-8be7-b25e4922a7d4",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "customer_storage_id",
+        "toTable": "custome_storage",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "cbb1cd0e-fb60-4be7-a797-9bbed0fadcfc",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "supplier_storage_id",
+        "toTable": "supplier_storage",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "45444849-c400-45c9-a5af-216f77b21a89",
+        "fromTable": "parentOrder",
+        "fromColumn": "supplier_storage_id",
+        "toTable": "supplier_storage_parent",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "55463418-3e61-41c9-86ad-fe93e7ee09ff",
+        "fromTable": "parentOrder",
+        "fromColumn": "customer_storage_id",
+        "toTable": "custome_storage_parent",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "b701cfb5-4940-40af-b052-f4d8bf401448",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "reason_id",
+        "toTable": "refusal_reason",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "91e33861-1740-4e09-a152-4a6c76f21fbd",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "id",
+        "toTable": "standard",
+        "toColumn": "id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "647470f7-1c4d-409a-bb06-1eb7bc046422",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "standard_id",
+        "toTable": "Тип номенклатуры",
+        "toColumn": "standard_id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "ad556ac6-3b57-4226-abc6-5f3e7e472a97",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "standard_id",
+        "toTable": "VX_prod",
+        "toColumn": "standard_id",
+        "crossFilteringBehavior": "bothDirections"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "400"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}
