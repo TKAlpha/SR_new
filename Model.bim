@@ -9,7 +9,7 @@
         "name": "SqlServer 10.2.1.92 reports_abom",
         "connectionString": "Provider=SQLNCLI11;Data Source=10.2.1.92;Initial Catalog=reports_abom;Persist Security Info=false;User ID=CORP\\pgbaranov;Integrated Security=SSPI",
         "impersonationMode": "impersonateAccount",
-        "account": "CORP\\pgbaranov",
+        "account": "CORP\\arzhandarov",
         "annotations": [
           {
             "name": "ConnectionEditUISource",
@@ -1253,12 +1253,6 @@
         "name": "parentOrder",
         "columns": [
           {
-            "name": "id",
-            "dataType": "int64",
-            "sourceColumn": "id",
-            "sourceProviderType": "Integer"
-          },
-          {
             "name": "customer_contractor_id",
             "dataType": "int64",
             "sourceColumn": "customer_contractor_id",
@@ -1281,6 +1275,11 @@
             "dataType": "int64",
             "sourceColumn": "supplier_storage_id",
             "sourceProviderType": "Integer"
+          },
+          {
+            "name": "parent_id",
+            "dataType": "int64",
+            "sourceColumn": "parent_id"
           }
         ],
         "partitions": [
@@ -1290,12 +1289,24 @@
             "source": {
               "type": "query",
               "query": [
-                "SELECT [id]",
-                "      ,[customer_contractor_id]",
-                "      ,[supplier_contractor_id]",
-                "      ,[customer_storage_id]",
-                "      ,[supplier_storage_id]",
-                "  FROM [reports_abom].[dbo].[document_order]"
+                "SELECT \t[reports_abom].[dbo].[document_order].[parent_id] ",
+                "      ,[reports_abom].[dbo].[document_order].[customer_contractor_id]",
+                "      ,[reports_abom].[dbo].[document_order].[supplier_contractor_id]",
+                "      ,[reports_abom].[dbo].[document_order].[customer_storage_id]",
+                "      ,[reports_abom].[dbo].[document_order].[supplier_storage_id]",
+                "  FROM [reports_abom].[dbo].[document_order] ",
+                "\tLEFT JOIN (SELECT",
+                "\t\t\t\t\tid",
+                "\t\t\t\t\t,[parent_id] ",
+                "\t\t\t\t  ,[customer_contractor_id]",
+                "\t\t\t\t  ,[supplier_contractor_id]",
+                "\t\t\t\t  ,[customer_storage_id]",
+                "\t\t\t\t  ,[supplier_storage_id]",
+                "\t\t\t\t  ,status_id",
+                "\t\t\t  FROM [reports_abom].[dbo].[document_order]",
+                "\t\t\t  WHERE parent_id IN(297384,297727,293283,300755) AND status_id='new') AS o1",
+                "\tON [reports_abom].[dbo].[document_order].id=o1.id",
+                "  WHERE [reports_abom].[dbo].[document_order].[parent_id] IS NOT NULL AND o1.id IS NULL"
               ],
               "dataSource": "SqlServer 10.2.1.92 reports_abom"
             },
@@ -1303,12 +1314,24 @@
               {
                 "name": "QueryEditorSerialization",
                 "value": [
-                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT [id]",
-                  "      ,[customer_contractor_id]",
-                  "      ,[supplier_contractor_id]",
-                  "      ,[customer_storage_id]",
-                  "      ,[supplier_storage_id]",
-                  "  FROM [reports_abom].[dbo].[document_order]</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT \t[reports_abom].[dbo].[document_order].[parent_id] ",
+                  "      ,[reports_abom].[dbo].[document_order].[customer_contractor_id]",
+                  "      ,[reports_abom].[dbo].[document_order].[supplier_contractor_id]",
+                  "      ,[reports_abom].[dbo].[document_order].[customer_storage_id]",
+                  "      ,[reports_abom].[dbo].[document_order].[supplier_storage_id]",
+                  "  FROM [reports_abom].[dbo].[document_order] ",
+                  "\tLEFT JOIN (SELECT",
+                  "\t\t\t\t\tid",
+                  "\t\t\t\t\t,[parent_id] ",
+                  "\t\t\t\t  ,[customer_contractor_id]",
+                  "\t\t\t\t  ,[supplier_contractor_id]",
+                  "\t\t\t\t  ,[customer_storage_id]",
+                  "\t\t\t\t  ,[supplier_storage_id]",
+                  "\t\t\t\t  ,status_id",
+                  "\t\t\t  FROM [reports_abom].[dbo].[document_order]",
+                  "\t\t\t  WHERE parent_id IN(297384,297727,293283,300755) AND status_id='new') AS o1",
+                  "\tON [reports_abom].[dbo].[document_order].id=o1.id",
+                  "  WHERE [reports_abom].[dbo].[document_order].[parent_id] IS NOT NULL AND o1.id IS NULL</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
                 ]
               }
             ]
@@ -1318,12 +1341,24 @@
           {
             "name": "_TM_ExtProp_QueryDefinition",
             "value": [
-              "SELECT [id]",
-              "      ,[customer_contractor_id]",
-              "      ,[supplier_contractor_id]",
-              "      ,[customer_storage_id]",
-              "      ,[supplier_storage_id]",
-              "  FROM [reports_abom].[dbo].[document_order]"
+              "SELECT \t[reports_abom].[dbo].[document_order].[parent_id] ",
+              "      ,[reports_abom].[dbo].[document_order].[customer_contractor_id]",
+              "      ,[reports_abom].[dbo].[document_order].[supplier_contractor_id]",
+              "      ,[reports_abom].[dbo].[document_order].[customer_storage_id]",
+              "      ,[reports_abom].[dbo].[document_order].[supplier_storage_id]",
+              "  FROM [reports_abom].[dbo].[document_order] ",
+              "\tLEFT JOIN (SELECT",
+              "\t\t\t\t\tid",
+              "\t\t\t\t\t,[parent_id] ",
+              "\t\t\t\t  ,[customer_contractor_id]",
+              "\t\t\t\t  ,[supplier_contractor_id]",
+              "\t\t\t\t  ,[customer_storage_id]",
+              "\t\t\t\t  ,[supplier_storage_id]",
+              "\t\t\t\t  ,status_id",
+              "\t\t\t  FROM [reports_abom].[dbo].[document_order]",
+              "\t\t\t  WHERE parent_id IN(297384,297727,293283,300755) AND status_id='new') AS o1",
+              "\tON [reports_abom].[dbo].[document_order].id=o1.id",
+              "  WHERE [reports_abom].[dbo].[document_order].[parent_id] IS NOT NULL AND o1.id IS NULL"
             ]
           },
           {
@@ -1333,12 +1368,24 @@
           {
             "name": "QueryEditorSerialization",
             "value": [
-              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT [id]",
-              "      ,[customer_contractor_id]",
-              "      ,[supplier_contractor_id]",
-              "      ,[customer_storage_id]",
-              "      ,[supplier_storage_id]",
-              "  FROM [reports_abom].[dbo].[document_order]</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT \t[reports_abom].[dbo].[document_order].[parent_id] ",
+              "      ,[reports_abom].[dbo].[document_order].[customer_contractor_id]",
+              "      ,[reports_abom].[dbo].[document_order].[supplier_contractor_id]",
+              "      ,[reports_abom].[dbo].[document_order].[customer_storage_id]",
+              "      ,[reports_abom].[dbo].[document_order].[supplier_storage_id]",
+              "  FROM [reports_abom].[dbo].[document_order] ",
+              "\tLEFT JOIN (SELECT",
+              "\t\t\t\t\tid",
+              "\t\t\t\t\t,[parent_id] ",
+              "\t\t\t\t  ,[customer_contractor_id]",
+              "\t\t\t\t  ,[supplier_contractor_id]",
+              "\t\t\t\t  ,[customer_storage_id]",
+              "\t\t\t\t  ,[supplier_storage_id]",
+              "\t\t\t\t  ,status_id",
+              "\t\t\t  FROM [reports_abom].[dbo].[document_order]",
+              "\t\t\t  WHERE parent_id IN(297384,297727,293283,300755) AND status_id='new') AS o1",
+              "\tON [reports_abom].[dbo].[document_order].id=o1.id",
+              "  WHERE [reports_abom].[dbo].[document_order].[parent_id] IS NOT NULL AND o1.id IS NULL</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
             ]
           }
         ]
@@ -2403,14 +2450,6 @@
         "crossFilteringBehavior": "bothDirections"
       },
       {
-        "name": "706f77e3-bea3-411b-9a60-97447228c8ad",
-        "fromTable": "OrderShipmentRefusal",
-        "fromColumn": "parent_id",
-        "toTable": "parentOrder",
-        "toColumn": "id",
-        "crossFilteringBehavior": "bothDirections"
-      },
-      {
         "name": "894cf867-367a-482a-b23a-79470672d8da",
         "fromTable": "parentOrder",
         "fromColumn": "supplier_contractor_id",
@@ -2488,6 +2527,14 @@
         "fromColumn": "standard_id",
         "toTable": "VX_prod",
         "toColumn": "standard_id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "31aa8997-d3d7-4cc1-9150-4209f847e930",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "id",
+        "toTable": "parentOrder",
+        "toColumn": "parent_id",
         "crossFilteringBehavior": "bothDirections"
       }
     ],
