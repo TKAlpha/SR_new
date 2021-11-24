@@ -9,7 +9,7 @@
         "name": "SqlServer 10.2.1.92 reports_abom",
         "connectionString": "Provider=SQLNCLI11;Data Source=10.2.1.92;Initial Catalog=reports_abom;Persist Security Info=false;User ID=CORP\\pgbaranov;Integrated Security=SSPI",
         "impersonationMode": "impersonateAccount",
-        "account": "CORP\\pgbaranov",
+        "account": "CORP\\arzhandarov",
         "annotations": [
           {
             "name": "ConnectionEditUISource",
@@ -355,6 +355,27 @@
               "",
               "IF(ISBLANK(OrderShipmentRefusal[refusal_upper_limit]),RELATED(refusal_reason[title]), OrderShipmentRefusal[refusal_upper_limit])"
             ]
+          },
+          {
+            "type": "calculated",
+            "name": "countDeal",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "CALCULATE(COUNT(OrderShipmentRefusal[deal_id]),ALLEXCEPT(OrderShipmentRefusal,OrderShipmentRefusal[deal_id]))"
+          },
+          {
+            "type": "calculated",
+            "name": "countOrderId",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "CALCULATE(COUNT(OrderShipmentRefusal[id]),ALLEXCEPT(OrderShipmentRefusal,OrderShipmentRefusal[id]))"
+          },
+          {
+            "type": "calculated",
+            "name": "tupeOrder",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "IF(DIVIDE(OrderShipmentRefusal[countDeal],OrderShipmentRefusal[countOrderId])>1,\"Транзитный заказ\",\"Заказ\")"
           }
         ],
         "partitions": [
