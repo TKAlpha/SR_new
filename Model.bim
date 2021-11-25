@@ -2500,6 +2500,66 @@
             ]
           }
         ]
+      },
+      {
+        "name": "Sign",
+        "columns": [
+          {
+            "name": "standard_id",
+            "dataType": "int64",
+            "sourceColumn": "standard_id",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "title",
+            "dataType": "string",
+            "sourceColumn": "title",
+            "sourceProviderType": "VarChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Sign",
+            "dataView": "full",
+            "source": {
+              "type": "query",
+              "query": [
+                "SELECt ssr.standard_id, ss.title FROM reports_abom.dbo.standard_sign_relation AS ssr",
+                "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ssr.sign_id = ss.id"
+              ],
+              "dataSource": "SqlServer 10.2.1.92 reports_abom"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECt ssr.standard_id, ss.title FROM reports_abom.dbo.standard_sign_relation AS ssr",
+                  "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ssr.sign_id = ss.id</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECt ssr.standard_id, ss.title FROM reports_abom.dbo.standard_sign_relation AS ssr",
+              "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ssr.sign_id = ss.id"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Sign"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECt ssr.standard_id, ss.title FROM reports_abom.dbo.standard_sign_relation AS ssr",
+              "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ssr.sign_id = ss.id</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
       }
     ],
     "relationships": [
@@ -2605,6 +2665,14 @@
         "fromColumn": "id",
         "toTable": "parentOrder",
         "toColumn": "parent_id",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "aec43419-b3b8-4f11-bdf0-1529cdda8667",
+        "fromTable": "Sign",
+        "fromColumn": "standard_id",
+        "toTable": "standard",
+        "toColumn": "id",
         "crossFilteringBehavior": "bothDirections"
       }
     ],
