@@ -9,7 +9,7 @@
         "name": "SqlServer 10.2.1.92 reports_abom",
         "connectionString": "Provider=SQLNCLI11;Data Source=10.2.1.92;Initial Catalog=reports_abom;Persist Security Info=false;User ID=CORP\\pgbaranov;Integrated Security=SSPI",
         "impersonationMode": "impersonateAccount",
-        "account": "CORP\\arzhandarov",
+        "account": "CORP\\pgbaranov",
         "annotations": [
           {
             "name": "ConnectionEditUISource",
@@ -372,7 +372,7 @@
           },
           {
             "type": "calculated",
-            "name": "tupeOrder",
+            "name": "typeOrder",
             "dataType": "string",
             "isDataTypeInferred": true,
             "expression": "IF(DIVIDE(OrderShipmentRefusal[countDeal],OrderShipmentRefusal[countOrderId])>1,\"Транзитный заказ\",\"Заказ\")"
