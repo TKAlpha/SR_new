@@ -9,7 +9,7 @@
         "name": "SqlServer 10.2.1.92 reports_abom",
         "connectionString": "Provider=SQLNCLI11;Data Source=10.2.1.92;Initial Catalog=reports_abom;Persist Security Info=false;User ID=CORP\\pgbaranov;Integrated Security=SSPI",
         "impersonationMode": "impersonateAccount",
-        "account": "CORP\\pgbaranov",
+        "account": "CORP\\arzhandarov",
         "annotations": [
           {
             "name": "ConnectionEditUISource",
@@ -372,20 +372,67 @@
           },
           {
             "type": "calculated",
-            "name": "typeOrder",
+            "name": "tupeOrder",
             "dataType": "string",
             "isDataTypeInferred": true,
             "expression": "IF(DIVIDE(OrderShipmentRefusal[countDeal],OrderShipmentRefusal[countOrderId])>1,\"Транзитный заказ\",\"Заказ\")"
           },
           {
-            "name": "amount_limit_exceeded",
-            "dataType": "boolean",
-            "sourceColumn": "amount_limit_exceeded"
+            "name": "order_item_datetime",
+            "dataType": "dateTime",
+            "sourceColumn": "order_item_datetime"
           },
           {
-            "name": "standard_title",
-            "dataType": "string",
-            "sourceColumn": "standard_title"
+            "name": "planned_shipping_datetime",
+            "dataType": "dateTime",
+            "sourceColumn": "planned_shipping_datetime"
+          },
+          {
+            "name": "shipment_datetime",
+            "dataType": "dateTime",
+            "sourceColumn": "shipment_datetime"
+          },
+          {
+            "type": "calculated",
+            "name": "newShipmentDate(23hour)",
+            "dataType": "dateTime",
+            "isDataTypeInferred": true,
+            "expression": [
+              "IF(",
+              "\tDATEDIFF(OrderShipmentRefusal[planned_shipping_datetime],OrderShipmentRefusal[shipment_datetime],HOUR)>=23,",
+              "\tOrderShipmentRefusal[shipment_datetime]-TIME(23,0,0),",
+              "\tOrderShipmentRefusal[shipment_datetime]",
+              "\t)"
+            ]
+          },
+          {
+            "type": "calculated",
+            "name": "Отклонение(с учётом 23 часов)",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": [
+              " ",
+              "    IF(",
+              "        ISBLANK('OrderShipmentRefusal'[doc_date]),",
+              "        DATEDIFF(",
+              "            'OrderShipmentRefusal'[planned_shipping_date],",
+              "            TODAY(),",
+              "            DAY",
+              "        ),",
+              "        DATEDIFF(",
+              "            'OrderShipmentRefusal'[planned_shipping_date],",
+              "            'OrderShipmentRefusal'[newShipmentDate(23hour)],",
+              "            DAY",
+              "        )",
+              "    )"
+            ]
+          },
+          {
+            "type": "calculated",
+            "name": "Сумма заказа/дубликаты",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": "DIVIDE(OrderShipmentRefusal[order_item_amount],OrderShipmentRefusal[duplicates])"
           }
         ],
         "partitions": [
@@ -405,12 +452,10 @@
                 "o.supplier_contractor_id,",
                 "o.supplier_storage_id,",
                 "o.standard_id,",
-                "o.standard_title,",
                 "o.standard_article,",
                 "o.standard_brand_id,",
                 "o.standard_brand_title,",
                 "o.order_status_id,",
-                "o.amount_limit_exceeded,",
                 "CASE ",
                 "WHEN o.order_discriminator='order' THEN 'Заказ'",
                 "WHEN o.order_discriminator='transit-order' THEN 'Транзит'",
@@ -418,18 +463,21 @@
                 "WHEN o.order_discriminator='movement-order' THEN 'Внутреннее перемещение'",
                 "END AS order_discriminator,",
                 "o.order_item_date,",
+                "o.order_item_datetime,",
                 "o.planned_shipping_date,",
+                "o.planned_shipping_datetime,",
                 "o.conditional_execution_date,",
                 "o.order_item_quantity,",
                 "o.order_item_amount,",
                 "ship.shipment_date,",
+                "ship.shipment_datetime,",
                 "ship.shipment_amount,",
                 "ship.shipment_quantity,",
                 "ref.reason_id,",
                 "ref.refusal_date,",
                 "ref.ref_quantity,",
                 "ref.ref_amount,",
-                "IIF(o.amount_limit_exceeded = 1, 'Превышение лимита', NULL) AS refusal_upper_limit,",
+                "IIF(o.order_status_id = 'new', 'Превышение лимита', NULL) AS refusal_upper_limit,",
                 "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
                 "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
                 "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
@@ -448,22 +496,21 @@
                 "\t\t\tord.supplier_contractor_id,",
                 "\t\t\tord.supplier_storage_id,",
                 "\t\t\tdoi.standard_id,",
-                "\t\t\tdoi.standard_title,",
                 "            doi.standard_article,",
                 "\t\t\tdoi.standard_brand_id,",
                 "\t\t\tdoi.standard_brand_title,",
                 "\t\t\tord.status_id AS order_status_id,",
                 "\t\t\tord.discriminator order_discriminator,",
-                "\t\t\tord.amount_limit_exceeded,",
                 "\t\t\tCAST(doi.created AS date) AS order_item_date,",
+                "\t\t\tdoi.created AS order_item_datetime,",
                 "\t\t\tCAST(ord.planned_shipping_date AS date) AS planned_shipping_date,",
+                "\t\t\tord.planned_shipping_date AS planned_shipping_datetime,",
                 "\t\t\tCAST(ord.conditional_execution_date AS date) AS conditional_execution_date,",
                 "\t\t\tdoi.quantity AS order_item_quantity,",
                 "\t\t\tdoi.amount AS order_item_amount",
                 "\t\t\tFROM reports_abom.dbo.document_order ord",
                 "\t\tLEFT JOIN reports_abom.dbo.document_order_item doi",
-                "\t\t\tON ord.id=doi.order_id",
-                "\t\t\tWHERE ord.status_id != 'new') o",
+                "\t\t\tON ord.id=doi.order_id) o",
                 "\tLEFT JOIN (SELECT ",
                 "\t\t\t\t\tsri.order_item_id,",
                 "\t\t\t\t\tMAX(sr.reason_id) AS reason_id,",
@@ -493,6 +540,7 @@
                 "\tLEFT JOIN (SELECT  ",
                 "\t\t\t\t\torder_item_id,",
                 "\t\t\t\t\tCAST(created AS date) AS shipment_date,",
+                "\t\t\t\t\tcreated AS shipment_datetime,",
                 "\t\t\t\t\tamount AS shipment_amount,",
                 "\t\t\t\t\tquantity AS shipment_quantity",
                 "\t\t\t\tFROM reports_abom.dbo.document_shipment_item) ship",
@@ -514,12 +562,10 @@
                   "o.supplier_contractor_id,",
                   "o.supplier_storage_id,",
                   "o.standard_id,",
-                  "o.standard_title,",
                   "o.standard_article,",
                   "o.standard_brand_id,",
                   "o.standard_brand_title,",
                   "o.order_status_id,",
-                  "o.amount_limit_exceeded,",
                   "CASE ",
                   "WHEN o.order_discriminator='order' THEN 'Заказ'",
                   "WHEN o.order_discriminator='transit-order' THEN 'Транзит'",
@@ -527,18 +573,21 @@
                   "WHEN o.order_discriminator='movement-order' THEN 'Внутреннее перемещение'",
                   "END AS order_discriminator,",
                   "o.order_item_date,",
+                  "o.order_item_datetime,",
                   "o.planned_shipping_date,",
+                  "o.planned_shipping_datetime,",
                   "o.conditional_execution_date,",
                   "o.order_item_quantity,",
                   "o.order_item_amount,",
                   "ship.shipment_date,",
+                  "ship.shipment_datetime,",
                   "ship.shipment_amount,",
                   "ship.shipment_quantity,",
                   "ref.reason_id,",
                   "ref.refusal_date,",
                   "ref.ref_quantity,",
                   "ref.ref_amount,",
-                  "IIF(o.amount_limit_exceeded = 1, 'Превышение лимита', NULL) AS refusal_upper_limit,",
+                  "IIF(o.order_status_id = 'new', 'Превышение лимита', NULL) AS refusal_upper_limit,",
                   "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
                   "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
                   "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
@@ -557,22 +606,21 @@
                   "\t\t\tord.supplier_contractor_id,",
                   "\t\t\tord.supplier_storage_id,",
                   "\t\t\tdoi.standard_id,",
-                  "\t\t\tdoi.standard_title,",
                   "            doi.standard_article,",
                   "\t\t\tdoi.standard_brand_id,",
                   "\t\t\tdoi.standard_brand_title,",
                   "\t\t\tord.status_id AS order_status_id,",
                   "\t\t\tord.discriminator order_discriminator,",
-                  "\t\t\tord.amount_limit_exceeded,",
                   "\t\t\tCAST(doi.created AS date) AS order_item_date,",
+                  "\t\t\tdoi.created AS order_item_datetime,",
                   "\t\t\tCAST(ord.planned_shipping_date AS date) AS planned_shipping_date,",
+                  "\t\t\tord.planned_shipping_date AS planned_shipping_datetime,",
                   "\t\t\tCAST(ord.conditional_execution_date AS date) AS conditional_execution_date,",
                   "\t\t\tdoi.quantity AS order_item_quantity,",
                   "\t\t\tdoi.amount AS order_item_amount",
                   "\t\t\tFROM reports_abom.dbo.document_order ord",
                   "\t\tLEFT JOIN reports_abom.dbo.document_order_item doi",
-                  "\t\t\tON ord.id=doi.order_id",
-                  "\t\t\tWHERE ord.status_id != 'new') o",
+                  "\t\t\tON ord.id=doi.order_id) o",
                   "\tLEFT JOIN (SELECT ",
                   "\t\t\t\t\tsri.order_item_id,",
                   "\t\t\t\t\tMAX(sr.reason_id) AS reason_id,",
@@ -602,6 +650,7 @@
                   "\tLEFT JOIN (SELECT  ",
                   "\t\t\t\t\torder_item_id,",
                   "\t\t\t\t\tCAST(created AS date) AS shipment_date,",
+                  "\t\t\t\t\tcreated AS shipment_datetime,",
                   "\t\t\t\t\tamount AS shipment_amount,",
                   "\t\t\t\t\tquantity AS shipment_quantity",
                   "\t\t\t\tFROM reports_abom.dbo.document_shipment_item) ship",
@@ -625,12 +674,10 @@
               "o.supplier_contractor_id,",
               "o.supplier_storage_id,",
               "o.standard_id,",
-              "o.standard_title,",
               "o.standard_article,",
               "o.standard_brand_id,",
               "o.standard_brand_title,",
               "o.order_status_id,",
-              "o.amount_limit_exceeded,",
               "CASE ",
               "WHEN o.order_discriminator='order' THEN 'Заказ'",
               "WHEN o.order_discriminator='transit-order' THEN 'Транзит'",
@@ -638,18 +685,21 @@
               "WHEN o.order_discriminator='movement-order' THEN 'Внутреннее перемещение'",
               "END AS order_discriminator,",
               "o.order_item_date,",
+              "o.order_item_datetime,",
               "o.planned_shipping_date,",
+              "o.planned_shipping_datetime,",
               "o.conditional_execution_date,",
               "o.order_item_quantity,",
               "o.order_item_amount,",
               "ship.shipment_date,",
+              "ship.shipment_datetime,",
               "ship.shipment_amount,",
               "ship.shipment_quantity,",
               "ref.reason_id,",
               "ref.refusal_date,",
               "ref.ref_quantity,",
               "ref.ref_amount,",
-              "IIF(o.amount_limit_exceeded = 1, 'Превышение лимита', NULL) AS refusal_upper_limit,",
+              "IIF(o.order_status_id = 'new', 'Превышение лимита', NULL) AS refusal_upper_limit,",
               "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
               "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
               "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
@@ -668,22 +718,21 @@
               "\t\t\tord.supplier_contractor_id,",
               "\t\t\tord.supplier_storage_id,",
               "\t\t\tdoi.standard_id,",
-              "\t\t\tdoi.standard_title,",
               "            doi.standard_article,",
               "\t\t\tdoi.standard_brand_id,",
               "\t\t\tdoi.standard_brand_title,",
               "\t\t\tord.status_id AS order_status_id,",
               "\t\t\tord.discriminator order_discriminator,",
-              "\t\t\tord.amount_limit_exceeded,",
               "\t\t\tCAST(doi.created AS date) AS order_item_date,",
+              "\t\t\tdoi.created AS order_item_datetime,",
               "\t\t\tCAST(ord.planned_shipping_date AS date) AS planned_shipping_date,",
+              "\t\t\tord.planned_shipping_date AS planned_shipping_datetime,",
               "\t\t\tCAST(ord.conditional_execution_date AS date) AS conditional_execution_date,",
               "\t\t\tdoi.quantity AS order_item_quantity,",
               "\t\t\tdoi.amount AS order_item_amount",
               "\t\t\tFROM reports_abom.dbo.document_order ord",
               "\t\tLEFT JOIN reports_abom.dbo.document_order_item doi",
-              "\t\t\tON ord.id=doi.order_id",
-              "\t\t\tWHERE ord.status_id != 'new') o",
+              "\t\t\tON ord.id=doi.order_id) o",
               "\tLEFT JOIN (SELECT ",
               "\t\t\t\t\tsri.order_item_id,",
               "\t\t\t\t\tMAX(sr.reason_id) AS reason_id,",
@@ -713,6 +762,7 @@
               "\tLEFT JOIN (SELECT  ",
               "\t\t\t\t\torder_item_id,",
               "\t\t\t\t\tCAST(created AS date) AS shipment_date,",
+              "\t\t\t\t\tcreated AS shipment_datetime,",
               "\t\t\t\t\tamount AS shipment_amount,",
               "\t\t\t\t\tquantity AS shipment_quantity",
               "\t\t\t\tFROM reports_abom.dbo.document_shipment_item) ship",
@@ -736,12 +786,10 @@
               "o.supplier_contractor_id,",
               "o.supplier_storage_id,",
               "o.standard_id,",
-              "o.standard_title,",
               "o.standard_article,",
               "o.standard_brand_id,",
               "o.standard_brand_title,",
               "o.order_status_id,",
-              "o.amount_limit_exceeded,",
               "CASE ",
               "WHEN o.order_discriminator='order' THEN 'Заказ'",
               "WHEN o.order_discriminator='transit-order' THEN 'Транзит'",
@@ -749,18 +797,21 @@
               "WHEN o.order_discriminator='movement-order' THEN 'Внутреннее перемещение'",
               "END AS order_discriminator,",
               "o.order_item_date,",
+              "o.order_item_datetime,",
               "o.planned_shipping_date,",
+              "o.planned_shipping_datetime,",
               "o.conditional_execution_date,",
               "o.order_item_quantity,",
               "o.order_item_amount,",
               "ship.shipment_date,",
+              "ship.shipment_datetime,",
               "ship.shipment_amount,",
               "ship.shipment_quantity,",
               "ref.reason_id,",
               "ref.refusal_date,",
               "ref.ref_quantity,",
               "ref.ref_amount,",
-              "IIF(o.amount_limit_exceeded = 1, 'Превышение лимита', NULL) AS refusal_upper_limit,",
+              "IIF(o.order_status_id = 'new', 'Превышение лимита', NULL) AS refusal_upper_limit,",
               "IIF(ship.order_item_id IS NOT NULL, ship.shipment_date, IIF(ref.order_item_id IS NOT NULL,ref.refusal_date, NULL )) AS doc_date,",
               "IIF(ship.order_item_id IS NOT NULL, ship.shipment_quantity, IIF(ref.order_item_id IS NOT NULL,ref.ref_quantity, NULL )) AS doc_quantity,",
               "IIF(ref.ref_quantity IS NULL,o.order_item_quantity/CAST(o.order_item_quantity AS float(8)),(o.order_item_quantity-ref.ref_quantity)/CAST(o.order_item_quantity AS float(8)))  AS fillrate_confirmed,",
@@ -779,22 +830,21 @@
               "\t\t\tord.supplier_contractor_id,",
               "\t\t\tord.supplier_storage_id,",
               "\t\t\tdoi.standard_id,",
-              "\t\t\tdoi.standard_title,",
               "            doi.standard_article,",
               "\t\t\tdoi.standard_brand_id,",
               "\t\t\tdoi.standard_brand_title,",
               "\t\t\tord.status_id AS order_status_id,",
               "\t\t\tord.discriminator order_discriminator,",
-              "\t\t\tord.amount_limit_exceeded,",
               "\t\t\tCAST(doi.created AS date) AS order_item_date,",
+              "\t\t\tdoi.created AS order_item_datetime,",
               "\t\t\tCAST(ord.planned_shipping_date AS date) AS planned_shipping_date,",
+              "\t\t\tord.planned_shipping_date AS planned_shipping_datetime,",
               "\t\t\tCAST(ord.conditional_execution_date AS date) AS conditional_execution_date,",
               "\t\t\tdoi.quantity AS order_item_quantity,",
               "\t\t\tdoi.amount AS order_item_amount",
               "\t\t\tFROM reports_abom.dbo.document_order ord",
               "\t\tLEFT JOIN reports_abom.dbo.document_order_item doi",
-              "\t\t\tON ord.id=doi.order_id",
-              "\t\t\tWHERE ord.status_id != 'new') o",
+              "\t\t\tON ord.id=doi.order_id) o",
               "\tLEFT JOIN (SELECT ",
               "\t\t\t\t\tsri.order_item_id,",
               "\t\t\t\t\tMAX(sr.reason_id) AS reason_id,",
@@ -824,6 +874,7 @@
               "\tLEFT JOIN (SELECT  ",
               "\t\t\t\t\torder_item_id,",
               "\t\t\t\t\tCAST(created AS date) AS shipment_date,",
+              "\t\t\t\t\tcreated AS shipment_datetime,",
               "\t\t\t\t\tamount AS shipment_amount,",
               "\t\t\t\t\tquantity AS shipment_quantity",
               "\t\t\t\tFROM reports_abom.dbo.document_shipment_item) ship",
@@ -1154,6 +1205,60 @@
           {
             "name": "Сумма неисполнения",
             "expression": " IF(([Сумма заказов] - [Сумма отгрузок] - [Сумма отказов]) < 0, 0, [Сумма заказов] - [Сумма отгрузок] - [Сумма отказов])"
+          },
+          {
+            "name": "ServiseRateM(23hour)",
+            "expression": [
+              " ",
+              "    VAR a = [ConfirmedFillRateM]",
+              "    VAR b = CALCULATE(",
+              "        [ShippmentFillRateM],OrderShipmentRefusal[Отклонение(с учётом 23 часов)]<=0)",
+              "    RETURN IF(DIVIDE(b,a)>1,1,",
+              "        IF(DIVIDE(b,a)<0,0,DIVIDE(b,a))",
+              ")"
+            ]
+          },
+          {
+            "name": "Delayed1to3(23hour)",
+            "expression": [
+              " ",
+              "    VAR a = [ConfirmedFillRateM]",
+              "    VAR b = CALCULATE(",
+              "        [ShippmentFillRateM],",
+              "        OrderShipmentRefusal[Отклонение(с учётом 23 часов)]>0,",
+              "        OrderShipmentRefusal[Отклонение(с учётом 23 часов)]<=3)",
+              "    RETURN     ",
+              "        IF(DIVIDE(b,a)>1,1,",
+              "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
+            ]
+          },
+          {
+            "name": "Delayed3to7(23hour)",
+            "expression": [
+              " ",
+              "    VAR a = [ConfirmedFillRateM]",
+              "    VAR b = CALCULATE(",
+              "        [ShippmentFillRateM],",
+              "        OrderShipmentRefusal[Отклонение(с учётом 23 часов)]>3,",
+              "        OrderShipmentRefusal[Отклонение(с учётом 23 часов)]<=7)",
+              "    RETURN",
+              "        IF(DIVIDE(b,a)>1,1,",
+              "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
+            ]
+          },
+          {
+            "name": "Delayed7(23hour)",
+            "expression": [
+              " ",
+              "    VAR a = [ConfirmedFillRateM]",
+              "    VAR b = CALCULATE(",
+              "        [ShippmentFillRateM],",
+              "        OrderShipmentRefusal[Отклонение(с учётом 23 часов)]>7",
+              "    )",
+              "    RETURN ",
+              "        IF(DIVIDE(b,a)>1,1,",
+              "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
+            ]
           }
         ]
       },
@@ -2500,66 +2605,6 @@
             ]
           }
         ]
-      },
-      {
-        "name": "Sign",
-        "columns": [
-          {
-            "name": "standard_id",
-            "dataType": "int64",
-            "sourceColumn": "standard_id",
-            "sourceProviderType": "Integer"
-          },
-          {
-            "name": "title",
-            "dataType": "string",
-            "sourceColumn": "title",
-            "sourceProviderType": "VarChar"
-          }
-        ],
-        "partitions": [
-          {
-            "name": "Sign",
-            "dataView": "full",
-            "source": {
-              "type": "query",
-              "query": [
-                "SELECt ssr.standard_id, ss.title FROM reports_abom.dbo.standard_sign_relation AS ssr",
-                "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ssr.sign_id = ss.id"
-              ],
-              "dataSource": "SqlServer 10.2.1.92 reports_abom"
-            },
-            "annotations": [
-              {
-                "name": "QueryEditorSerialization",
-                "value": [
-                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECt ssr.standard_id, ss.title FROM reports_abom.dbo.standard_sign_relation AS ssr",
-                  "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ssr.sign_id = ss.id</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
-                ]
-              }
-            ]
-          }
-        ],
-        "annotations": [
-          {
-            "name": "_TM_ExtProp_QueryDefinition",
-            "value": [
-              "SELECt ssr.standard_id, ss.title FROM reports_abom.dbo.standard_sign_relation AS ssr",
-              "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ssr.sign_id = ss.id"
-            ]
-          },
-          {
-            "name": "_TM_ExtProp_DbTableName",
-            "value": "Sign"
-          },
-          {
-            "name": "QueryEditorSerialization",
-            "value": [
-              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECt ssr.standard_id, ss.title FROM reports_abom.dbo.standard_sign_relation AS ssr",
-              "LEFT JOIN reports_abom.dbo.standard_sign AS ss ON ssr.sign_id = ss.id</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
-            ]
-          }
-        ]
       }
     ],
     "relationships": [
@@ -2665,14 +2710,6 @@
         "fromColumn": "id",
         "toTable": "parentOrder",
         "toColumn": "parent_id",
-        "crossFilteringBehavior": "bothDirections"
-      },
-      {
-        "name": "aec43419-b3b8-4f11-bdf0-1529cdda8667",
-        "fromTable": "Sign",
-        "fromColumn": "standard_id",
-        "toTable": "standard",
-        "toColumn": "id",
         "crossFilteringBehavior": "bothDirections"
       }
     ],
