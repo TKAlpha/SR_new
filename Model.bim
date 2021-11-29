@@ -9,7 +9,7 @@
         "name": "SqlServer 10.2.1.92 reports_abom",
         "connectionString": "Provider=SQLNCLI11;Data Source=10.2.1.92;Initial Catalog=reports_abom;Persist Security Info=false;User ID=CORP\\pgbaranov;Integrated Security=SSPI",
         "impersonationMode": "impersonateAccount",
-        "account": "CORP\\arzhandarov",
+        "account": "CORP\\pgbaranov",
         "annotations": [
           {
             "name": "ConnectionEditUISource",
@@ -429,10 +429,24 @@
           },
           {
             "type": "calculated",
-            "name": "Сумма заказа/дубликаты",
+            "name": "net_order_item_amount",
             "dataType": "double",
             "isDataTypeInferred": true,
-            "expression": "DIVIDE(OrderShipmentRefusal[order_item_amount],OrderShipmentRefusal[duplicates])"
+            "expression": " DIVIDE(OrderShipmentRefusal[order_item_amount], OrderShipmentRefusal[duplicates])"
+          },
+          {
+            "type": "calculated",
+            "name": "net_shipment_amount",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": " DIVIDE(OrderShipmentRefusal[shipment_amount],OrderShipmentRefusal[duplicates])"
+          },
+          {
+            "type": "calculated",
+            "name": "net_refusal_amount",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": " DIVIDE(OrderShipmentRefusal[ref_amount], OrderShipmentRefusal[duplicates])"
           }
         ],
         "partitions": [
@@ -1176,31 +1190,31 @@
           },
           {
             "name": "Сумма отгрузок в срок",
-            "expression": " CALCULATE(SUM(OrderShipmentRefusal[shipment_amount]), OrderShipmentRefusal[DeltaDay]<=0)"
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[DeltaDay]<=0)"
           },
           {
             "name": "Сумма отгрузок с задержкой до 3х дней",
-            "expression": " CALCULATE(SUM(OrderShipmentRefusal[shipment_amount]), OrderShipmentRefusal[DeltaDay]>0, OrderShipmentRefusal[DeltaDay]<=3)"
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[DeltaDay]>0, OrderShipmentRefusal[DeltaDay]<=3)"
           },
           {
             "name": "Сумма отгрузок с задержкой от 3х до 7 дней",
-            "expression": " CALCULATE(SUM(OrderShipmentRefusal[shipment_amount]), OrderShipmentRefusal[DeltaDay]>3, OrderShipmentRefusal[DeltaDay]<=7)"
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[DeltaDay]>3, OrderShipmentRefusal[DeltaDay]<=7)"
           },
           {
             "name": "Сумма отгрузок с задержкой больше 7 дней",
-            "expression": " CALCULATE(SUM(OrderShipmentRefusal[shipment_amount]), OrderShipmentRefusal[DeltaDay]>7)"
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[DeltaDay]>7)"
           },
           {
             "name": "Сумма отказов",
-            "expression": " SUM(OrderShipmentRefusal[ref_amount])"
+            "expression": " SUM(OrderShipmentRefusal[net_refusal_amount])"
           },
           {
             "name": "Сумма заказов",
-            "expression": " SUM(OrderShipmentRefusal[order_item_amount])"
+            "expression": " SUM(OrderShipmentRefusal[net_order_item_amount])"
           },
           {
             "name": "Сумма отгрузок",
-            "expression": " SUM(OrderShipmentRefusal[shipment_amount])"
+            "expression": " SUM(OrderShipmentRefusal[net_shipment_amount])"
           },
           {
             "name": "Сумма неисполнения",
