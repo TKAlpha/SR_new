@@ -1216,7 +1216,8 @@
               "    RETURN IF(DIVIDE(b,a)>1,1,",
               "        IF(DIVIDE(b,a)<0,0,DIVIDE(b,a))",
               ")"
-            ]
+            ],
+            "formatString": "0%;-0%;0%"
           },
           {
             "name": "Delayed1to3(23hour)",
@@ -1230,7 +1231,8 @@
               "    RETURN     ",
               "        IF(DIVIDE(b,a)>1,1,",
               "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
-            ]
+            ],
+            "formatString": "0%;-0%;0%"
           },
           {
             "name": "Delayed3to7(23hour)",
@@ -1244,7 +1246,8 @@
               "    RETURN",
               "        IF(DIVIDE(b,a)>1,1,",
               "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
-            ]
+            ],
+            "formatString": "0%;-0%;0%"
           },
           {
             "name": "Delayed7(23hour)",
@@ -1258,7 +1261,8 @@
               "    RETURN ",
               "        IF(DIVIDE(b,a)>1,1,",
               "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
-            ]
+            ],
+            "formatString": "0%;-0%;0%"
           }
         ]
       },
