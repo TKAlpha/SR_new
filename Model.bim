@@ -1277,6 +1277,22 @@
               "            IF(DIVIDE(b,a)<0,0,DIVIDE(b,a)))"
             ],
             "formatString": "0%;-0%;0%"
+          },
+          {
+            "name": "Сумма отгрузок в срок(23hour)",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[Отклонение(с учётом 23 часов)]<=0)"
+          },
+          {
+            "name": "Сумма отгрузок с задержкой до 3х дней(23hour)",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[DeltaDay]>0, OrderShipmentRefusal[Отклонение(с учётом 23 часов)]<=3)"
+          },
+          {
+            "name": "Сумма отгрузок с задержкой от 3х до 7 дней(23hour)",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[Отклонение(с учётом 23 часов)]>3, OrderShipmentRefusal[Отклонение(с учётом 23 часов)]<=7)"
+          },
+          {
+            "name": "Сумма отгрузок с задержкой больше 7 дней(23hour)",
+            "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[Отклонение(с учётом 23 часов)]>7)"
           }
         ]
       },
