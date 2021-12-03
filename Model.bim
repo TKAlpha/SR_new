@@ -1293,6 +1293,43 @@
           {
             "name": "Сумма отгрузок с задержкой больше 7 дней(23hour)",
             "expression": " CALCULATE(SUM(OrderShipmentRefusal[net_shipment_amount]), OrderShipmentRefusal[Отклонение(с учётом 23 часов)]>7)"
+          },
+          {
+            "name": "Сумма заказов(test)",
+            "expression": [
+              " CALCULATE('measure'[Сумма заказов],",
+              "\tDATESBETWEEN(OrderShipmentRefusal[order_item_date],",
+              "\t\tMIN(OrderShipmentRefusal[planned_shipping_date]),",
+              "\t\tMAX(OrderShipmentRefusal[planned_shipping_date])",
+              "\t\t)",
+              "\t)"
+            ]
+          },
+          {
+            "name": "Сумма отказов(test)",
+            "expression": [
+              " CALCULATE('measure'[Сумма отказов],",
+              "\tDATESBETWEEN(OrderShipmentRefusal[refusal_date],",
+              "\t\tMIN(OrderShipmentRefusal[planned_shipping_date]),",
+              "\t\tMAX(OrderShipmentRefusal[planned_shipping_date])",
+              "\t\t)",
+              "\t)"
+            ]
+          },
+          {
+            "name": "Сумма отгрузок(test)",
+            "expression": [
+              " CALCULATE('measure'[Сумма отгрузок],",
+              "\tDATESBETWEEN(OrderShipmentRefusal[shipment_date],",
+              "\t\tMIN(OrderShipmentRefusal[planned_shipping_date]),",
+              "\t\tMAX(OrderShipmentRefusal[planned_shipping_date])",
+              "\t\t)",
+              "\t)"
+            ]
+          },
+          {
+            "name": "Сумма неисполнения(test)",
+            "expression": "'measure'[Сумма заказов(test)]-'measure'[Сумма отказов(test)]-'measure'[Сумма отгрузок(test)]"
           }
         ]
       },
@@ -2639,6 +2676,28 @@
             ]
           }
         ]
+      },
+      {
+        "name": "DATE",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Date]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "CALENDAR(MIN(OrderShipmentRefusal[order_item_date]),MAX(OrderShipmentRefusal[planned_shipping_date]))"
+            }
+          }
+        ]
       }
     ],
     "relationships": [
@@ -2745,6 +2804,38 @@
         "toTable": "parentOrder",
         "toColumn": "parent_id",
         "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "54374fb3-d938-4b35-8c04-aa74294c1052",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "shipment_datetime",
+        "toTable": "DATE",
+        "toColumn": "Date",
+        "isActive": false
+      },
+      {
+        "name": "428a8918-5776-4e83-91ba-bd72a9573a02",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "planned_shipping_date",
+        "toTable": "DATE",
+        "toColumn": "Date",
+        "isActive": false
+      },
+      {
+        "name": "ebcad07f-d3ee-44a0-95ac-0f4e3f65777c",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "order_item_date",
+        "toTable": "DATE",
+        "toColumn": "Date",
+        "isActive": false
+      },
+      {
+        "name": "d9630b26-2bb4-4849-9210-b10a3cdd27c8",
+        "fromTable": "OrderShipmentRefusal",
+        "fromColumn": "refusal_date",
+        "toTable": "DATE",
+        "toColumn": "Date",
+        "isActive": false
       }
     ],
     "annotations": [
