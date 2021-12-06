@@ -342,11 +342,6 @@
             ]
           },
           {
-            "name": "refusal_upper_limit",
-            "dataType": "string",
-            "sourceColumn": "refusal_upper_limit"
-          },
-          {
             "type": "calculated",
             "name": "refusal_reason",
             "dataType": "string",
@@ -447,6 +442,11 @@
             "dataType": "double",
             "isDataTypeInferred": true,
             "expression": " DIVIDE(OrderShipmentRefusal[ref_amount], OrderShipmentRefusal[duplicates])"
+          },
+          {
+            "name": "refusal_upper_limit",
+            "dataType": "string",
+            "sourceColumn": "refusal_upper_limit"
           }
         ],
         "partitions": [
